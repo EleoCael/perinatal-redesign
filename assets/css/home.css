@@ -1,0 +1,156 @@
+.dropdown-menu {
+  z-index: 1050 !important;
+}
+/* Custom Dashboard Styles */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12) !important;
+}
+
+
+/* Animation for stats cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Loading state */
+.loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, #f0f0f0 63%);
+    background-size: 400% 100%;
+    animation: loading 1.5s ease infinite;
+}
+
+@keyframes loading {
+    0% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+/* Custom badge styles */
+.badge-maternal {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.badge-infant {
+    background-color: #3498db;
+    color: white;
+}
+
+.badge-postpartum {
+    background-color: #2ecc71;
+    color: white;
+}
+
+/* List group item hover effect */
+.list-group-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card-body .row .col-auto {
+        margin-top: 10px;
+    }
+    
+    .btn .d-flex {
+        flex-direction: row !important;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .btn i {
+        margin-right: 8px;
+        margin-bottom: 0 !important;
+    }
+}
+/* Recent Activity List Improvements */
+.list-group-item {
+    transition: background-color 0.2s ease;
+    border: none !important;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Ensure consistent spacing */
+.list-group-flush .list-group-item:last-child {
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Better text handling */
+.text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Compact layout for activity items */
+.activity-item {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* Badge improvements */
+.badge {
+    font-size: 0.7em;
+    padding: 0.25em 0.5em;
+}
+
+/* Icon sizing consistency */
+.fa-sm {
+    font-size: 0.875em;
+}
+
+/* Flexbox improvements for activity layout */
+.flex-shrink-0 {
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments for activity section */
+@media (max-width: 576px) {
+    .list-group-item {
+        padding: 0.75rem 1rem;
+    }
+    
+    .rounded-circle {
+        width: 35px !important;
+        height: 35px !important;
+    }
+    
+    .flex-grow-1 h6 {
+        font-size: 0.9rem;
+    }
+    
+    .flex-grow-1 p {
+        font-size: 0.8rem;
+    }
+}
+
+/* Gap utility for flex items */
+.gap-2 {
+    gap: 0.5rem;
+}

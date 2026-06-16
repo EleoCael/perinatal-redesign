@@ -1,0 +1,141 @@
+.filter-card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+.hidden {
+  display: none !important;
+}
+.report-print {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+/* Enhanced Print Styles - Add this to your report.css or create a separate print.css */
+
+@media print {
+    /* Hide all navigation and UI elements */
+    .navbar,
+    nav,
+    header,
+    .filter-card,
+    .btn,
+    button,
+    .sidebar,
+    .side-bar,
+    .menu,
+    footer,
+    .breadcrumb {
+        display: none !important;
+    }
+    
+    /* Reset body and html margins */
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+    
+    /* Remove container padding/margins that create white space */
+    .container,
+    .container-fluid,
+    main,
+    .main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    /* Style the report content */
+    .report-print,
+    #reportContent {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        background: white !important;
+    }
+    
+    /* Ensure report starts at top of page */
+    .report-print {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    /* Optimize table printing */
+    .table {
+        page-break-inside: auto;
+    }
+    
+    .table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    .table thead {
+        display: table-header-group;
+    }
+    
+    
+    .table tfoot {
+        display: table-footer-group;
+    }
+    
+    /* Make title prominent */
+    h4, h5 {
+        margin-top: 0 !important;
+        page-break-after: avoid;
+    }
+    
+    /* Ensure good print quality */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+}
+
+/* Screen-only styles (these won't appear in print) */
+@media screen {
+    .report-print {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+.btn-outline-primary.active {
+  background-color: #0d6efd;
+  color: white;
+}
+.indent {
+  padding-left: 30px;
+}
+.barangay-checkbox {
+  margin-bottom: 10px;
+}
+.select-all-container {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #dee2e6;
+}
+.table-sm th,
+.table-sm td {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.table thead th {
+        font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.5rem !important;
+    vertical-align: middle;
+    font-size: 0.9rem;
+    }

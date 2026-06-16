@@ -1,0 +1,144 @@
+.filter-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.report-print {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-outline-primary.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.report-header {
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 15px;
+}
+
+.table-responsive {
+    margin-top: 20px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table thead {
+    background-color: #f8f9fa;
+}
+
+.table thead th {
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.5rem !important;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.table tbody td {
+    padding: 0.5rem !important;
+    vertical-align: middle;
+    font-size: 0.9rem;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.fw-bold {
+    font-weight: 600;
+}
+
+/* Additional compact styling */
+.table-sm th,
+.table-sm td {
+    padding: 0.5rem !important;
+    font-size: 0.9rem;
+}
+
+/* Print Styles */
+@media print {
+    .navbar,
+    nav,
+    header,
+    .filter-card,
+    .btn,
+    button,
+    .sidebar,
+    .side-bar,
+    footer,
+    .breadcrumb {
+        display: none !important;
+    }
+    
+    html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+    }
+    
+    .container,
+    .container-fluid {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    
+    .report-print,
+    #reportContent {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    
+    .report-print {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+    }
+    
+    .table {
+        page-break-inside: auto;
+    }
+    
+    .table tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    .table thead {
+        display: table-header-group;
+    }
+    
+    h4, h5 {
+        margin-top: 0 !important;
+        page-break-after: avoid;
+    }
+    
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+}
