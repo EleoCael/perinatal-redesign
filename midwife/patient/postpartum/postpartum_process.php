@@ -3,191 +3,206 @@
 require_once "../../../module/db.config.php";
 session_start();
 
-if (isset($_POST['submit_btn'])) {
-    if ($_SERVER["REQUEST_METHOD"] === "POST") {
-        $first_name = $_POST['first_name'];
-        $middle_name = $_POST['middle_name'];
-        $last_name = $_POST['last_name'];
-        $birth_date = $_POST['birth_date'];
+header('Content-Type: application/json');
 
-        $sql_pospartum_patient_check = "SELECT patient_id FROM patient WHERE
-                first_name = ? AND
-                middle_name = ? AND
-                last_name = ? AND
-                birth_date = ? AND
-                patient_type = 'postpartum_mother'
+function respond($status, $data = []) {
+    echo json_encode(array_merge(['status' => $status], $data));
+    exit();
+}
+
+if (!isset($_POST['submit_btn']) || $_SERVER["REQUEST_METHOD"] !== "POST") {
+    respond('error', ['message' => 'Invalid request']);
+}
+
+$first_name  = $_POST['first_name'] ?? '';
+$middle_name = $_POST['middle_name'] ?? '';
+$last_name   = $_POST['last_name'] ?? '';
+$birth_date  = $_POST['birth_date'] ?? '';
+
+$sql_postpartum_patient_check = "SELECT patient_id FROM patient WHERE
+        first_name = ? AND
+        middle_name = ? AND
+        last_name = ? AND
+        birth_date = ? AND
+        patient_type = 'postpartum_mother'
+    ";
+
+$stmt_postpartum_patient_check = $conn->prepare($sql_postpartum_patient_check);
+$stmt_postpartum_patient_check->bind_param(
+    "ssss",
+    $first_name,
+    $middle_name,
+    $last_name,
+    $birth_date
+);
+$stmt_postpartum_patient_check->execute();
+$postpartum_patient_result = $stmt_postpartum_patient_check->get_result();
+
+if ($postpartum_patient_result->num_rows > 0) {
+    $stmt_postpartum_patient_check->close();
+    respond('error', ['message' => 'Maternal Postpartum Record already exists!']);
+}
+$stmt_postpartum_patient_check->close();
+
+$conn->begin_transaction();
+
+try {
+
+    // === AUTO-CREATE Patient USER ===
+    // NOTE: original postpartum_process.php reused the logged-in midwife's
+    // user_id for the patient record instead of creating a dedicated Patient
+    // account. This has been changed to match maternal_process.php's behavior
+    // — confirm this is what you want.
+    $registered_by_midwife_id = (int)$_SESSION['user_id'];
+    $health_center_id = (int)$_SESSION['health_center_id'];
+
+    $email_for_user = trim($_POST['email'] ?? '');
+    $patient_user_id = NULL;
+
+    if (!empty($email_for_user)) {
+
+        $stmt_chk_user = $conn->prepare("SELECT user_id FROM user WHERE user_email = ? LIMIT 1");
+        $stmt_chk_user->bind_param("s", $email_for_user);
+        $stmt_chk_user->execute();
+        $stmt_chk_user->bind_result($existing_uid);
+        if ($stmt_chk_user->fetch()) {
+            $stmt_chk_user->close();
+            throw new Exception("Patient login already exists for: " . $email_for_user);
+        }
+        $stmt_chk_user->close();
+
+        function _rand_hex($bytes) { return bin2hex(random_bytes($bytes)); }
+        $activation_token = _rand_hex(16);
+        $activation_token_hash = hash("sha256", $activation_token);
+        $activation_expiry = (new DateTime('+48 hours'))->format('Y-m-d H:i:s');
+
+        $temp_password_hash = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
+
+        $stmt_user = $conn->prepare("
+            INSERT INTO user
+            (first_name, last_name, user_email, password_hash, role,
+            account_activation_hash, activation_expires_at, health_center_id,
+            registered_by_user_id, is_verified)
+            VALUES (?, ?, ?, ?, 'Patient', ?, ?, ?, ?, 0)
+        ");
+        $stmt_user->bind_param(
+            "ssssssii",
+            $first_name,
+            $last_name,
+            $email_for_user,
+            $temp_password_hash,
+            $activation_token_hash,
+            $activation_expiry,
+            $health_center_id,
+            $registered_by_midwife_id
+        );
+        if (!$stmt_user->execute()) {
+            throw new Exception("User insert failed: " . $stmt_user->error);
+        }
+        $patient_user_id = $stmt_user->insert_id;
+        $stmt_user->close();
+
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/rhusystem/system/forgot-password/mailer.php';
+
+        $base_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")
+            . "://" . $_SERVER['HTTP_HOST'];
+        $activation_link = $base_url . "/rhusystem/system/forgot-password/activate_account.php?token=" . urlencode($activation_token);
+        try {
+            $mail->setFrom("rhusystem@gmail.com", "RHU System");
+            $mail->addAddress($email_for_user, $first_name . ' ' . $last_name);
+            $mail->Subject = "Activate Your RHU Account";
+            $mail->Body = "
+                <html>
+                    <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                        <div style='max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;'>
+                            <h2 style='color: #4a90e2;'>Welcome to RHU System</h2>
+                                <p>Hello <strong>{$first_name} {$last_name}</strong></p>
+                                <p>Your postpartum patient account has been created by your healthcare provider.</p>
+                                <p>Please click the link below to activate your account and set your password:</p>
+                                    <div  style='text-align: center; margin: 30px 0;'>
+                                        <a href='{$activation_link}' style='background-color: #4a90e2; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;'>Activate Account</a>
+                                    </div>
+                                <p>Or copy and paste this link in your browser:</p>
+                                <p style='word-break: break-all; color: #4a90e2;'>  {$activation_link}</p>
+                                <p>This link will expire in 48 hours.</p>
+                                <p>If you did not request this account, please ignore this email.</p>
+                                <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
+                                <p style='font-size: 12px; color: #777;'>RHU System - Perinatal Care Management</p>
+                        </div>
+                    </body>
+                </html>
             ";
 
-        $stmt_postpartum_patient_check = $conn->prepare($sql_pospartum_patient_check);
-        $stmt_postpartum_patient_check->bind_param(
-            "ssss",
-            $first_name,
-            $middle_name,
-            $last_name,
-            $birth_date
-        );
-        $stmt_postpartum_patient_check->execute();
-        $postpartum_patient_result = $stmt_postpartum_patient_check->get_result();
-
-        if ($postpartum_patient_result->num_rows > 0) {
-            $_SESSION['statusMessage'] = " Maternal Postpartum Record already exists!";
-            $_SESSION['statusMessageCode'] = "error";
-            header("Location: ../../midwife_dashboard.php");
-            exit();
-        }
-        $stmt_postpartum_patient_check->close();
-
-        $conn->begin_transaction();
-
-        try {
-
-            $sql_postpartum_patient_record = file_get_contents('../../../queries/maternal_insert/insert_maternal_patient.sql');
-            $stmt_postpartum_patient_insert = $conn->prepare($sql_postpartum_patient_record);
-
-            $user_id = $_SESSION['user_id'];
-            $registered_by_midwife_id = $_SESSION['user_id'];
-            $health_center_id = $_SESSION['health_center_id'];
-            $patient_type = 'postpartum_mother'; //para maindicate na for mother itong record haha
-            $mother_id = NULL; //since maternal record to, di nya need ng mother id, and purpose ng mother id ay para malink yung infant record sa record ng mother nya
-            $name_of_mother = NULL;
-            $pregnancy_id = !empty($_POST['pregnancy_id']) ? intval($_POST['pregnancy_id']) : null;
-            
-            //check kung valid yung age na ininput
-            if (!is_numeric($_POST['age']) || intval($_POST['age']) < 0) {
-                throw new Exception("Invalid age provided");
-            }
-            $age = intval($_POST['age']);
-
-            $contact_number = preg_replace('/[^0-9]/', '', $_POST['contact_number']); //check kung may ibang invalid char na kasama sa number, pag meron->tatanggalin
-            //11 lang length ng phone num dapat
-            if (strlen($contact_number) < 10 || strlen($contact_number) > 11) {
-                throw new Exception("Invalid contact number length");
+            if (!$mail->send()) {
+                throw new Exception("Email send failed: " . $mail->ErrorInfo);
             }
 
-            //check kung numbers ba ang input ng user or chars
-            if (!is_numeric($contact_number)) {
-                throw new Exception("Invalid contact number format.");
-            }
+            $mail->clearAddresses();
 
-
-            $stmt_postpartum_patient_insert->bind_param(
-                "iisssssssssssisssi",
-                $user_id,
-                $registered_by_midwife_id,
-                $patient_type,
-                $mother_id,
-                $_POST['date_of_registration'],
-                $_POST['family_serial_number'],
-                $first_name,
-                $middle_name,
-                $last_name,
-                $name_of_mother,
-                $_POST['address'],
-                $_POST['age_bracket'],
-                $birth_date,
-                $age,
-                $_POST['socio_economic_status'],
-                $_POST['contact_number'],
-                $_POST['email'],
-                $health_center_id
-            );
-
-            if (!$stmt_postpartum_patient_insert->execute()) {
-                throw new Exception("Postpartum Patient Record Insert Failed: " . $stmt_postpartum_patient_insert->error);
-            }
-
-            $patient_id = $conn->insert_id;
-            $stmt_postpartum_patient_insert->close();
-
-            //postpartum insert
-            $sql_pospartum_insert_record = file_get_contents('../../../queries/maternal_insert/insert_postpartum.sql');
-            $stmt_postpartum_insert_record = $conn->prepare($sql_pospartum_insert_record);
-            
-
-            $stmt_postpartum_insert_record->bind_param(
-                "iissssss",
-                $patient_id,
-                $pregnancy_id,
-                $_POST['post_delivery_date'],
-                $_POST['post_delivery_time'],
-                $_POST['checkup_visit'],
-                $_POST['post_checkup_date'],
-                $_POST['breastfeeding_date'],
-                $_POST['breastfeeding_time']
-            );
-
-            if (!$stmt_postpartum_insert_record->execute()) {
-                throw new Exception("Postpartum Record Insert Failed: " . $stmt_postpartum_insert_record->error);
-            }
-
-            $checkup_id = $conn->insert_id;
-            $stmt_postpartum_insert_record->close();
-
-            //postpartum supplement
-                $sql_postpartum_supp = file_get_contents('../../../queries/maternal_insert/insert_post_supp.sql');
-                $stmt_postpartum_supp = $conn->prepare($sql_postpartum_supp);
-
-                if (isset($_POST['vitamin_a'])) {
-                    $vitamin_a = 1;
-                }else{
-                    $vitamin_a = 0;
-                }
-
-                $stmt_postpartum_supp->bind_param("iissis",
-                $patient_id,
-                    $pregnancy_id,
-                    $_POST['iron_folic_month_given'],
-                    $_POST['iron_folic_date_given'],
-                    $_POST['tablets_given'],
-                    $_POST['remarks']
-                );
-
-                if (!$stmt_postpartum_supp->execute()) {
-                    throw new Exception("Postpartum Supplement Insert Failed: " .$stmt_postpartum_supp->error);
-                }
-
-                $post_supp_id = $conn->insert_id;
-                $stmt_postpartum_supp->close();
-
-                //postpartum vitamins
-               
-                $sql_postpartum_vit= file_get_contents('../../../queries/maternal_insert/insert_vitamin.sql');
-                $stmt_postpartum_vita = $conn->prepare($sql_postpartum_vit);
-
-                if (isset($_POST['vitamin_a'])) {
-                    $vitamin_a = 1;
-                }else{
-                    $vitamin_a = 0;
-                }
-
-                $stmt_postpartum_vita->bind_param("iiis",
-                $patient_id,
-                    $pregnancy_id,    
-                    $vitamin_a,
-                    $_POST['vitamin_a_date']
-
-                );
-
-                if (!$stmt_postpartum_vita->execute()) {
-                    throw new Exception("Postpartum Supplement Insert Failed: " .$stmt_postpartum_vita->error);
-                }
-
-                $vitamin_a_id = $conn->insert_id;
-                $stmt_postpartum_vita->close();
-
-
-            $conn->commit(); //proceed sa pag save sa db
-            //pagsuccess
-            $_SESSION['statusMessage'] = "Record Added Successfully!";
-            $_SESSION['statusMessageCode'] = "success";
-            header("Location: ../../midwife_dashboard.php");
-            exit();
         } catch (Exception $e) {
-             $conn->rollback();
-                $_SESSION['statusMessage'] = $e->getMessage();
-                $_SESSION['statusMessageCode'] = "error";
-                header("Location: add_postpartum.php");
-                exit();
+            error_log("Failed to send activation email to {$email_for_user}: " . $e->getMessage());
+            $_SESSION['email_warning'] = "Patient account created, but activation email failed to send.";
         }
     }
+    // === AUTO-CREATE Patient USER — END ===
+
+    $sql_postpartum_patient_record = file_get_contents('../../../queries/maternal_insert/insert_maternal_patient.sql');
+    $stmt_postpartum_patient_insert = $conn->prepare($sql_postpartum_patient_record);
+
+    $patient_type = 'postpartum_mother';
+    $mother_id = NULL;
+    $name_of_mother = NULL;
+
+    if (!is_numeric($_POST['age']) || intval($_POST['age']) < 0) {
+        throw new Exception("Invalid age provided");
+    }
+    $age = intval($_POST['age']);
+
+    $contact_number = preg_replace('/[^0-9]/', '', $_POST['contact_number']);
+    if (strlen($contact_number) < 10 || strlen($contact_number) > 11) {
+        throw new Exception("Invalid contact number length");
+    }
+    if (!is_numeric($contact_number)) {
+        throw new Exception("Invalid contact number format.");
+    }
+
+    $stmt_postpartum_patient_insert->bind_param(
+        "iisssssssssssisssi",
+        $patient_user_id,
+        $registered_by_midwife_id,
+        $patient_type,
+        $mother_id,
+        $_POST['date_of_registration'],
+        $_POST['family_serial_number'],
+        $first_name,
+        $middle_name,
+        $last_name,
+        $name_of_mother,
+        $_POST['address'],
+        $_POST['age_bracket'],
+        $birth_date,
+        $age,
+        $_POST['socio_economic_status'],
+        $_POST['contact_number'],
+        $email_for_user,
+        $health_center_id
+    );
+
+    if (!$stmt_postpartum_patient_insert->execute()) {
+        throw new Exception("Postpartum Patient Record Insert Failed: " . $stmt_postpartum_patient_insert->error);
+    }
+
+    $patient_id = $conn->insert_id;
+    $stmt_postpartum_patient_insert->close();
+
+    $conn->commit();
+
+    respond('success', [
+        'patient_id'   => $patient_id,
+        'patient_type' => 'postpartum'
+    ]);
+
+} catch (Exception $e) {
+    $conn->rollback();
+    respond('error', ['message' => $e->getMessage()]);
 }

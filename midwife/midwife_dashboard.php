@@ -27,8 +27,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     <link rel="stylesheet" href="../assets/css/report_midwife.css">
     <link rel="stylesheet" href="../assets/css/filter_btn.css">
     
-    
-
 
 </head>
 
@@ -62,7 +60,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                 <span>Patient Records</span>
             </a>
 
-            <a href="#" class="sidebar-nav-link" onclick="loadPage('addPatient_LandingPg.php', this);">
+            <a href="#" class="sidebar-nav-link" onclick="loadPage('redo-addPatient_info.php', this);">
                 <i class="bi bi-person-plus  text-white"></i>
                 <span>Add New Patient</span>
             </a>

@@ -252,7 +252,7 @@ $patientCounts = getPatientCounts($conn, $health_center_id);
                             </button>
                         </div>
                         <div class="col-xl-4 col-md-6 mb-3">
-                            <button class="btn btn-outline-success w-100 h-100 py-3" onclick="loadPage('addPatient_LandingPg.php')">
+                            <button class="btn btn-outline-success w-100 h-100 py-3" onclick="loadPage('redo-addPatient_info.php')">
                                 <div class="d-flex flex-column align-items-center">
                                     <i class="bi bi-person-plus-fill fa-2x mb-2 text-success"></i>
                                     <span class="fw-bold">Add Patient</span>

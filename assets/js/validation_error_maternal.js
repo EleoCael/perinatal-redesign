@@ -547,7 +547,7 @@ document.addEventListener("submit", function (e) {
         confirmButtonText: "OK",
         confirmButtonColor: "#3085d6",
       }).then(() => {
-        loadPage('addPatient_LandingPg.php');
+        loadPage('home.php');
       });
     })
     .catch(err => {
@@ -564,4 +564,335 @@ document.addEventListener("submit", function (e) {
 
 document.addEventListener("DOMContentLoaded", function () {
   setupFormNavigation();
+});
+
+// ─── Patient Type dropdown (Maternal / Infant / Postpartum) ───
+// Uses event delegation on `document` so this works even when the
+// Patient Information form is injected dynamically via loadPage()
+// (inline <script> tags inside injected HTML never execute).
+const PATIENT_FORM_ACTIONS = {
+  maternal:   "/rhusystem/midwife/patient/maternal/maternal_process.php",
+  postpartum: "/rhusystem/midwife/patient/postpartum/postpartum_process.php", // TODO: confirm path
+  infant:     "/rhusystem/midwife/patient/infant/infant_process.php"
+};
+
+// ─── Age Bracket: auto-derived from Date of Birth, locked once set ───
+function updateAgeBracketFromBirthdate() {
+  const birthDateInput = document.getElementById("birth_date_input");
+  const ageBracketRadios = document.querySelectorAll('input[name="age_bracket"]');
+  const ageInput = document.getElementById("age");
+  if (!birthDateInput || ageBracketRadios.length === 0) return;
+
+  const birthDateValue = birthDateInput.value;
+
+  if (!birthDateValue) {
+    // No birth date yet — clear and unlock so it's ready once a date is entered
+    ageBracketRadios.forEach((r) => { r.checked = false; r.disabled = false; });
+    return;
+  }
+
+  const birth = new Date(birthDateValue);
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+
+  let bracketValue = null;
+  if (age >= 10 && age <= 14) bracketValue = "10-14";
+  else if (age >= 15 && age <= 19) bracketValue = "15-19";
+  else if (age >= 20 && age <= 49) bracketValue = "20-49";
+
+  ageBracketRadios.forEach((r) => {
+    r.checked = r.value === bracketValue;
+    r.disabled = true; // locked — value is derived, not user-editable
+  });
+
+  if (ageInput && !ageInput.disabled) {
+    ageInput.value = age;
+  }
+}
+
+document.addEventListener("input", function (e) {
+  if (e.target && e.target.id === "birth_date_input") {
+    updateAgeBracketFromBirthdate();
+  }
+});
+
+function applyPatientType(type) {
+  const form = document.getElementById("patientInfoForm");
+  const fieldsContainer = document.getElementById("patient_fields_container");
+  if (!form || !fieldsContainer || !PATIENT_FORM_ACTIONS[type]) return;
+
+  const firstNameInput    = document.getElementById("first_name_input");
+  const middleNameInput   = document.getElementById("middle_name_input");
+  const lastNameInput     = document.getElementById("last_name_input");
+  const birthDateInput    = document.getElementById("birth_date_input");
+  const nameOfMotherGroup = document.getElementById("name_of_mother_group");
+  const nameOfMotherInput = document.getElementById("name_of_mother_input");
+  const ageBracketGroup   = document.getElementById("age_bracket_group");
+  const ageGroup          = document.getElementById("age_group");
+  const ageInput          = document.getElementById("age");
+  const ageBracketRadios  = document.querySelectorAll('input[name="age_bracket"]');
+
+  // Reveal the rest of the form now that a type has been chosen
+  fieldsContainer.style.display = "";
+  form.action = PATIENT_FORM_ACTIONS[type];
+
+  // Clear any leftover validation state from a previous selection
+  document.querySelectorAll('[id^="error_"]').forEach((span) => (span.textContent = ""));
+  document.querySelectorAll(".form-control, .form-select").forEach((el) => (el.style.border = ""));
+
+  if (type === "infant") {
+    firstNameInput.name  = "infant_first_name";
+    middleNameInput.name = "infant_middle_name";
+    lastNameInput.name   = "infant_last_name";
+    birthDateInput.name  = "infant_birth_date";
+
+    nameOfMotherGroup.style.display = "";
+    nameOfMotherInput.disabled = false;
+
+    ageBracketGroup.style.display = "none";
+    ageGroup.style.display = "none";
+    ageBracketRadios.forEach((r) => { r.checked = false; r.disabled = true; });
+    ageInput.value = "";
+    ageInput.disabled = true;
+  } else {
+    // Maternal & Postpartum share the same field names
+    firstNameInput.name  = "first_name";
+    middleNameInput.name = "middle_name";
+    lastNameInput.name   = "last_name";
+    birthDateInput.name  = "birth_date";
+
+    nameOfMotherGroup.style.display = "none";
+    nameOfMotherInput.value = "";
+    nameOfMotherInput.disabled = true;
+
+    ageBracketGroup.style.display = "";
+    ageGroup.style.display = "";
+    ageInput.disabled = false;
+    updateAgeBracketFromBirthdate(); // re-lock/re-derive based on current birth date value
+  }
+}
+
+document.addEventListener("change", function (e) {
+  if (e.target && e.target.id === "patient_type") {
+    applyPatientType(e.target.value);
+  }
+});
+
+// Contact number live-display (only relevant if a #display_contact element exists on the page)
+document.addEventListener("input", function (e) {
+  if (e.target && e.target.id === "contact_number") {
+    const display = document.getElementById("display_contact");
+    if (display) display.textContent = e.target.value || "the patient's contact number";
+  }
+});
+
+// ─── Patient Info form: standalone Submit (not part of a multi-tab flow) ───
+const MEDICAL_INFO_PAGES = {
+  maternal:   "patient/maternal/add_maternal_medical.php",
+  postpartum: "patient/postpartum/add_postpartum_medical.php",
+  infant:     "patient/infant/add_infant_medical.php"
+};
+
+function validatePatientInfoForm(form) {
+  let isValid = true;
+  const errorMessages = [];
+
+  document.querySelectorAll('[id^="error_"]').forEach((span) => (span.textContent = ""));
+  document.querySelectorAll(".form-control, .form-select").forEach((el) => (el.style.border = ""));
+
+  function fail(input, spanId, message) {
+    if (input) input.style.border = "2px solid #dc3545";
+    const span = document.getElementById(spanId);
+    if (span) span.textContent = message;
+    isValid = false;
+    errorMessages.push(message);
+  }
+
+  const patientTypeSelect = document.getElementById("patient_type");
+  if (!patientTypeSelect || !patientTypeSelect.value) {
+    fail(patientTypeSelect, "error_patient_type", "Please select a patient type");
+    return { isValid, errorMessages };
+  }
+  const type = patientTypeSelect.value;
+
+  const isInfant = type === "infant";
+  const firstNameInput = form.querySelector(isInfant ? 'input[name="infant_first_name"]' : 'input[name="first_name"]');
+  const lastNameInput  = form.querySelector(isInfant ? 'input[name="infant_last_name"]'  : 'input[name="last_name"]');
+  const birthDateInput = form.querySelector(isInfant ? 'input[name="infant_birth_date"]' : 'input[name="birth_date"]');
+
+  if (!firstNameInput || !firstNameInput.value.trim()) {
+    fail(firstNameInput, "error_first_name", "First name is required");
+  } else if (!validateName(firstNameInput.value)) {
+    fail(firstNameInput, "error_first_name", "First name must contain only letters");
+  }
+
+  if (!lastNameInput || !lastNameInput.value.trim()) {
+    fail(lastNameInput, "error_last_name", "Last name is required");
+  } else if (!validateName(lastNameInput.value)) {
+    fail(lastNameInput, "error_last_name", "Last name must contain only letters");
+  }
+
+  if (!birthDateInput || !birthDateInput.value) {
+    fail(birthDateInput, "error_birth_date", "Date of birth is required");
+  } else if (!validateFutureDate(birthDateInput.value)) {
+    fail(birthDateInput, "error_birth_date", "Date cannot be in the future");
+  }
+
+  const houseStreetInput = document.getElementById("house_street_input");
+  const purokSitioInput  = document.getElementById("purok_sitio_input");
+  const barangaySelect   = document.getElementById("barangay_input");
+  const cityInput        = document.getElementById("city_input");
+  const provinceInput    = document.getElementById("province_input");
+  const addressHidden    = document.getElementById("address_hidden");
+
+  if (!houseStreetInput || !houseStreetInput.value.trim()) {
+    fail(houseStreetInput, "error_house_street", "House/Unit No. & Street is required");
+  }
+  if (!barangaySelect || !barangaySelect.value) {
+    fail(barangaySelect, "error_barangay", "Please select a barangay");
+  }
+
+  if (houseStreetInput && houseStreetInput.value.trim() && barangaySelect && barangaySelect.value) {
+    const composedAddress = [
+      houseStreetInput.value.trim(),
+      purokSitioInput && purokSitioInput.value.trim() ? purokSitioInput.value.trim() : null,
+      "Brgy. " + barangaySelect.value,
+      cityInput ? cityInput.value : null,
+      provinceInput ? provinceInput.value : null
+    ].filter(Boolean).join(", ");
+
+    if (composedAddress.length > 100) {
+      fail(houseStreetInput, "error_house_street", "Address is too long — please shorten it");
+    } else if (addressHidden) {
+      addressHidden.value = composedAddress;
+    }
+  }
+
+  const dateRegInput = form.querySelector('input[name="date_of_registration"]');
+  if (!dateRegInput || !dateRegInput.value) {
+    fail(dateRegInput, "error_date_of_registration", "Date of registration is required");
+  } else if (!validateFutureDate(dateRegInput.value)) {
+    fail(dateRegInput, "error_date_of_registration", "Date cannot be in the future");
+  }
+
+  const familySerialInput = form.querySelector('input[name="family_serial_number"]');
+  if (!familySerialInput || !familySerialInput.value.trim()) {
+    fail(familySerialInput, "error_family_serial_number", "Family serial number is required");
+  }
+
+  const socioEconSelect = form.querySelector('select[name="socio_economic_status"]');
+  if (!socioEconSelect || !socioEconSelect.value) {
+    fail(socioEconSelect, "error_socio_economic_status", "Please select socio-economic status");
+  }
+
+  const contactInput = form.querySelector('input[name="contact_number"]');
+  if (!contactInput || !contactInput.value.trim()) {
+    fail(contactInput, "error_contact_number", "Contact number is required");
+  } else if (!validateContactNumber(contactInput.value)) {
+    fail(contactInput, "error_contact_number", "Must be 11 digits starting with 09");
+  }
+
+  const emailInput = form.querySelector('input[name="email"]');
+  if (emailInput && emailInput.value.trim() && !validateEmail(emailInput.value)) {
+    emailInput.style.border = "2px solid #dc3545";
+    isValid = false;
+    errorMessages.push("Please enter a valid email address");
+  }
+
+  if (isInfant) {
+    const nameOfMotherInput = form.querySelector('input[name="name_of_mother"]');
+    if (!nameOfMotherInput || !nameOfMotherInput.value.trim()) {
+      fail(nameOfMotherInput, "error_name_of_mother", "Complete name of Mother is required");
+    }
+  } else {
+    const ageInput = form.querySelector('input[name="age"]');
+    const ageBracketInput = form.querySelector('input[name="age_bracket"]:checked');
+    if (!ageInput || ageInput.value === "" || isNaN(parseInt(ageInput.value))) {
+      fail(ageInput, "error_age", "Age is required");
+    }
+    if (!ageBracketInput) {
+      const span = document.getElementById("error_age_bracket");
+      if (span) span.textContent = "Please select an age bracket";
+      isValid = false;
+      errorMessages.push("Age bracket is required");
+    } else if (ageInput && ageInput.value && !validateAgeBracket(ageInput.value, ageBracketInput.value)) {
+      fail(ageInput, "error_age", "Age does not match selected bracket");
+    }
+  }
+
+  return { isValid, errorMessages, patientType: type };
+}
+
+document.addEventListener("click", function (e) {
+  const button = e.target.closest(".js-submit_patient_info");
+  if (!button) return;
+
+  const form = document.getElementById("patientInfoForm");
+  if (!form) return;
+
+  const result = validatePatientInfoForm(form);
+  if (!result.isValid) {
+    Swal.fire({
+      icon: "error",
+      title: "Please fix the following errors:",
+      html: result.errorMessages.map((msg) => `• ${msg}`).join("<br>"),
+      confirmButtonText: "OK",
+      confirmButtonColor: "#c0392b",
+    });
+    return;
+  }
+
+  button.disabled = true;
+
+  const formData = new FormData(form);
+  formData.append("submit_btn", "1");
+
+  fetch(form.action, { method: "POST", body: formData })
+    .then((response) => response.json())
+    .then((data) => {
+      button.disabled = false;
+      if (data.status !== "success") {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          text: data.message || "Please try again.",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#c0392b",
+        });
+        return;
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Record Added Successfully!",
+        text: "Would you like to add the medical information now?",
+        showCancelButton: true,
+        confirmButtonText: "Add Medical Info",
+        cancelButtonText: "Later",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#6c757d",
+      }).then((swalResult) => {
+        if (swalResult.isConfirmed) {
+          const nextPage = MEDICAL_INFO_PAGES[result.patientType];
+          loadPage(`${nextPage}?patient_id=${encodeURIComponent(data.patient_id)}`);
+        } else {
+          loadPage("home.php");
+        }
+      });
+    })
+    .catch((err) => {
+      button.disabled = false;
+      console.error("Submit error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Something went wrong",
+        text: "Please try again.",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#c0392b",
+      });
+    });
 });
