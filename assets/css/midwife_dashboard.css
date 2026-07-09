@@ -1,0 +1,407 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+    --primary-color: #0E6C93; 
+    --secondary-color: #5AA16B; /* Secondary color - green tone */
+    --accent-color: #F8C314; /* Accent color - yellow */
+    --dark-text: #222; /* Dark text color */
+    --light-text: #f0f0f0; /* Light text color (for dark bg) */
+    --bg-light: #f7f9fa; /* Background color for main pages */
+    --sidebar-width: 280px; /* Default sidebar width */
+    --navbar-height: 70px; /* Default navbar height */
+}
+
+/* Universal reset - removes default margin/padding and fixes box sizing */
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+/* Default body styling */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-light); /* Light gray background */
+    color: var(--dark-text); /* Text color */
+    line-height: 1.6; /* Spacing between lines */
+}
+
+/* ========== NAVBAR STYLES ========== */
+.main-navbar {
+    background: linear-gradient(135deg, var(--primary-color), #0B5775); /* Gradient background for navbar */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Adds subtle shadow */
+    height: var(--navbar-height); /* Fixed navbar height */
+    position: fixed; /* Sticks navbar to top */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030; /* Ensures navbar is on top of other elements */
+}
+
+/* Branding style (logo + text) */
+.navbar-brand {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; /* Makes text thick */
+    color: white !important; /* Forces text color to white */
+    font-size: 1.5rem; /* Increases font size */
+    display: flex; /* Aligns logo and text side by side */
+    align-items: center;
+}
+
+/* Logo before brand name (using pseudo-element) */
+.navbar-brand::before {
+    content: ''; /* Creates an empty element */
+    width: 40px;
+    height: 40px;
+    background: url('/rhusystem/assets/img/pericare_Logo.png') center/contain no-repeat; /* Sets logo image */
+    margin-right: 12px; /* Adds spacing between logo and text */
+}
+
+/* Button that appears when screen is small (hamburger icon) */
+.navbar-toggler {
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Removes outline when toggler is focused */
+.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+/* Hides dropdown arrow icon (default bootstrap) */
+.dropdown-toggle::after {
+    display: none;
+}
+
+/* User dropdown style (rounded white-transparent box) */
+.user-dropdown {
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 50px; /* Makes it oval */
+    padding: 8px 16px;
+    color: white;
+    transition: all 0.3s ease;
+}
+
+/* Hover effect for dropdown */
+.user-dropdown:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.3);
+}
+
+/* ========== SIDEBAR STYLES ========== */
+.sidebar-container {
+    position: fixed; /* Fixed sidebar */
+    top: var(--navbar-height); /* Starts below navbar */
+    left: 0;
+    width: var(--sidebar-width);
+    height: calc(100vh - var(--navbar-height)); /* Full height minus navbar */
+    background: linear-gradient(180deg, #1a1a2e, #16213e); /* Dark blue gradient */
+    z-index: 1020;
+    overflow-y: auto; /* Scroll if content is tall */
+    transition: transform 0.3s ease; /* Smooth transition for show/hide */
+}
+
+/* Scrollbar design for sidebar */
+.sidebar-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 3px;
+}
+
+/* Sidebar navigation layout */
+.sidebar-nav {
+    padding: 2rem 0; /* Top and bottom spacing */
+}
+
+/* Sidebar section title (like “Dashboard”, “Settings”) */
+.sidebar-section-title {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 1.5rem;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Removes top margin on first section */
+.sidebar-section-title:first-child {
+    margin-top: 0;
+}
+
+/* Sidebar link styles */
+.sidebar-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 1.5rem;
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover or active state for links */
+.sidebar-nav-link:hover, .sidebar-nav-link.active {
+    color: white;
+    border-left-color: var(--accent-color); /* Yellow line on left */
+    background: rgba(94, 161, 107, 0.2); /* Slight green overlay */
+}
+
+/* Animated gradient effect when hovering */
+.sidebar-nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+/* Expands gradient when hovered */
+.sidebar-nav-link:hover::before {
+    width: 100%;
+}
+
+/* Active state style for current page link */
+.sidebar-nav-link.active {
+    color: white;
+    border-left-color: var(--accent-color);
+    background: rgba(94, 161, 107, 0.2);
+}
+
+/* Sidebar link icons */
+.sidebar-nav-link i {
+    font-size: 1.1rem;
+    margin-right: 12px;
+    min-width: 20px;
+    text-align: center;
+}
+
+/* Decorative divider line between sections */
+.sidebar-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    margin: 1.5rem 1rem;
+}
+
+/* ========== MAIN CONTENT AREA ========== */
+.main-content {
+    margin-left: var(--sidebar-width); /* Space for sidebar */
+    margin-top: var(--navbar-height); /* Space for navbar */
+    min-height: calc(100vh - var(--navbar-height)); /* Fills screen height */
+    padding: 2rem;
+    background-color: var(--bg-light);
+}
+
+/* Card styling for content sections */
+.content-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Page header (big colored title banner) */
+.page-header {
+    background: white;
+    color: var(--primary-color);
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+/* Page header title text */
+.page-header h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2.0rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Page header subtitle */
+.page-header p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* ========== RESPONSIVE DESIGN (for mobile screens) ========== */
+@media (max-width: 991.98px) {
+    .sidebar-container {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-container.show {
+        transform: translateX(0); 
+    }
+
+    .main-content {
+        margin-left: 0; 
+        padding: 1rem;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+    }
+}
+
+.offcanvas.sidebar-nav {
+    width: var(--sidebar-width) !important;
+    background: linear-gradient(180deg, #1a1a2e, #16213e);
+}
+
+/* ========== ANIMATIONS ========== */
+.fade-in {
+    animation: fadeIn 0.6s ease-in-out; 
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px); 
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); 
+    }
+}
+
+/* ========== WELCOME CARD STYLES ========== */
+.welcome-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(14, 108, 147, 0.3);
+}
+
+/* Welcome card title */
+.welcome-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+/* Welcome card paragraph */
+.welcome-card p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ========== STATS CARD STYLES ========== */
+.stats-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.stats-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    color: white;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    font-family: 'Inter', sans-serif;
+}
+
+
+.stats-label {
+    color: #666;
+    font-weight: 500;
+}
+
+
+/* ========== LANDING PAGE CARD STYLES ========== */
+.tab-header {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Individual landing page card */
+.card-landing {
+    border-radius: 15px;
+    min-height: 250px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Hover effect para umangat yung card */
+.card-landing:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Layout inside landing card */
+.body-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 2rem;
+}
+
+/* Card title text */
+.title-card {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white;
+    text-transform: uppercase;
+}
+
+/* Button style sa landing page */
+.landing-btn {
+    font-weight: 600;
+    border-radius: 50px;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover animation for button */
+.landing-btn:hover {
+    transform: scale(1.05);
+}
+
+
