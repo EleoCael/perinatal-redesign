@@ -26,10 +26,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     <link rel="stylesheet" href="../assets/css/midwife_dashboard.css">
     <link rel="stylesheet" href="../assets/css/report_midwife.css">
     <link rel="stylesheet" href="../assets/css/filter_btn.css">
-    
-    
-
-
 </head>
 
 <body>
@@ -101,48 +97,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     <!-- Main Page -->
 
     <!--=========================================MATERNAL MODAL ============================-->
-
-    <!-- Modal for viewing maternal record -->
-    <div class="modal" tabindex="-1" id="myModal">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Maternal Record</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="modalContent"></div>
-
-                    <div id="pregnancyList"> </div>
-
-                </div>
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal for viewing maternal record -->
-
-    <!-- Modal for viewing pregnancy record -->
-    <div class="modal" tabindex="-1" id="viewPregnancyRecord">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="pregnancyModalTitle">Pregnancy Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="pregDetails"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal for viewing pregnancy record -->
 
     <!-- Modal for adding prenatal checkup -->
     <div class="modal" tabindex="-1" id="addCheckupModal">
@@ -987,114 +941,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     </div>
     <!-- Modal for adding postpartum details maternal -->
 
-
-    <!-- Modal for editing/updating maternal record -->
-    <div class="modal fade" tabindex="-1" id="editModal">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-
-                <form id="editMaternalForm" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Maternal Record</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <div class="modal-body" id="editModalBody" style="max-height: 70vh; overflow-y: auto;">
-                        <input type="hidden" name="patient_id" id="edit_patient_id">
-
-                        <div class="mb-3">
-                            <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="first_name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Middle Name</label>
-                            <input type="text" class="form-control" name="middle_name">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="last_name" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Date of Registration</label>
-                            <input type="date" class="form-control" name="date_of_registration"
-                             max="<?php echo date('Y-m-d'); ?>" id="date_of_registration">
-                            <span id="error_date_of_registration" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Family Serial No.</label>
-                            <input type="text" class="form-control" name="family_serial_number">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Socio-Economic Status</label>
-                            <select class="form-select" name="socio_economic_status">
-                                <option value="" disabled selected>Select Status</option>
-                                <option value="1 - NHTS">1-NHTS</option>
-                                <option value="2 - Non-NHTS">2-Non-NHTS</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Address</label>
-                            <input type="text" class="form-control" name="address">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Date of Birth</label>
-                            <input type="date" class="form-control" name="birth_date"
-                             max="<?php echo date('Y-m-d'); ?>" id="birth_date">
-                            <span id="error_birth_date" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Age Bracket</label>
-                            <div class="age-bracket-container mt-2">
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="age_bracket" value="10-14" id="age_bracket_1">
-                                    <label class="form-check-label" for="age_bracket_1">10–14 y/o</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="age_bracket" value="15-19" id="age_bracket_2">
-                                    <label class="form-check-label" for="age_bracket_2">15–19 y/o</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="age_bracket" value="20-49" id="age_bracket_3">
-                                    <label class="form-check-label" for="age_bracket_3">20–49 y/o</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Age <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" min="0" max="120" name="age" id="age" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Email (optional)</label>
-                            <input type="email" class="form-control" name="email">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Contact Number</label>
-                            <input type="tel" class="form-control" name="contact_number">
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
-                    </div>
-
-                    <div class="modal-footer bg-white" style="position: sticky; bottom: 0;">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </form>
-
-            </div>
-        </div>
-    </div>
-    <!-- Modal for editing/updating maternal record -->
-
     <!-- Modal for editing/updating postpartum record -->
     <div class="modal fade" tabindex="-1" id="editPostpartumModal">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -1287,28 +1133,6 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     <!--=========================================MATERNAL MODAL ============================-->
 
     <!--========================================INFANT MODAL =================================-->
-
-    <!-- Modal for viewing maternal record -->
-    <div class="modal" tabindex="-1" id="myInfantModal">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Infant Record</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="infantModalContent"></div>
-
-                </div>
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Modal for viewing maternal record -->
-
     <!-- Modal for adding referral date -->
     <div class="modal" tabindex="-1" id="addReferralModal">
         <div class="modal-dialog modal-lg">

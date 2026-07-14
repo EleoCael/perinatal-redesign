@@ -102,17 +102,10 @@ $(document).on("click", ".delete_infant_btn", function () {
 //view button function
 $(document).on("click", ".view_infant_btn", function () {
   let id = $(this).data("id");
+
   //this is for basic patient info
-  $.ajax({
-    url: "patient/infant/view_btn_infant.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#infantModalContent").html(result);
-      $('#myInfantModal').modal('show');
-      
-    }
-  });
+  loadPage(
+        "patient/infant/view_btn_infant.php?patient_id=" + id
+    );
 });
 //view button function

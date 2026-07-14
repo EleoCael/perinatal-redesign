@@ -186,9 +186,6 @@ function getData($result): string
                         <button class='btn btn-sm btn-primary edit_btn' data-id='{$patient_id}'>
                             <i class='bi bi-pencil-square' style='color: white;'></i>
                         </button>
-                        <button class='btn btn-sm btn-danger delete_btn' data-id='{$patient_id}'>
-                            <i class='bi bi-trash3-fill' style='color: white;'></i>
-                        </button>
                     </td>
                 </tr>
             ";

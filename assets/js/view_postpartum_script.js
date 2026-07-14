@@ -119,22 +119,8 @@ $(document).on("click", " .delete_postpartum_btn", function () {
 $(document).on("click", ".view_postpartum_btn", function () {
   let id = $(this).data("id");
   //this is for basic patient info
-  $.ajax({
-    url: "patient/postpartum/view_btn_postpartum.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#postpartumModalContent").html(result);
-      $('#myPostpartumModal').modal('show');
-      
-    },
-    error: function(xhr, status, error) {
-            console.error("View AJAX Error:", status, error);
-          
-            $("#postpartumModalContent").html("<p class='text-danger'>Error loading record details.</p>");
-            $('#myPostpartumModal').modal('show');
-        }
-  });
+  loadPage(
+    'patient/postpartum/view_btn_postpartum.php?patient_id=' + id
+  );
 });
 //view button function

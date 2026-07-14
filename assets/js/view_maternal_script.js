@@ -125,41 +125,19 @@ $(document).on("click", " .delete_btn", function () {
 $(document).on("click", ".view_btn", function () {
   let id = $(this).data("id");
   //this is for basic patient info
-  $.ajax({
-    url: "patient/maternal/view_btn_maternal.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#modalContent").html(result);
-      $('#myModal').modal('show');
-      
-    }
-  });
+  loadPage(
+    'patient/maternal/view_btn_maternal.php?patient_id=' + id
+  );
 });
 //view button function
 
 //view button function for pregnancy details
 $(document).on("click", ".view_preg_btn", function () {
-  let pregId = $(this).data("preg-id");
-  let pregNum = $(this). data("preg-num");
-  let dateCreated = $(this). data("date-created");
+    let pregId = $(this).data("preg-id");
 
-  let title = 'Pregnancy # ' + pregNum + '( Date Created: ' + dateCreated + ')';
-  $('#pregnancyModalTitle').text(title);
-
-   $('#pregDetails').html('<div class="text-center">Loading details...</div>');
-
-  $.ajax({
-      url: "patient/maternal/view_preg_details.php",
-      method: "POST",
-      data: {pregnancy_id: pregId},
-      success: function (result) {
-        
-        $('#pregDetails').html(result);
-        $('#viewPregnancyRecord').modal('show');  
-      }
-  });
+    loadPage(
+        "patient/maternal/view_preg_details.php?pregnancy_id=" + pregId
+    );
 });
 
 //view button function for pregnancy details
