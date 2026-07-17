@@ -93,15 +93,15 @@ body {
 
 /* ========== SIDEBAR STYLES ========== */
 .sidebar-container {
-    position: fixed; /* Fixed sidebar */
-    top: var(--navbar-height); /* Starts below navbar */
+    position: fixed;
+    top: 0;
     left: 0;
     width: var(--sidebar-width);
-    height: calc(100vh - var(--navbar-height)); /* Full height minus navbar */
-    background: linear-gradient(180deg, #1a1a2e, #16213e); /* Dark blue gradient */
+    height: 100vh;
+    background: linear-gradient(180deg, #1a1a2e, #16213e);
     z-index: 1020;
-    overflow-y: auto; /* Scroll if content is tall */
-    transition: transform 0.3s ease; /* Smooth transition for show/hide */
+    overflow-y: auto;
+    transition: transform 0.3s ease;
 }
 
 /* Scrollbar design for sidebar */
@@ -198,9 +198,9 @@ body {
 
 /* ========== MAIN CONTENT AREA ========== */
 .main-content {
-    margin-left: var(--sidebar-width); /* Space for sidebar */
-    margin-top: var(--navbar-height); /* Space for navbar */
-    min-height: calc(100vh - var(--navbar-height)); /* Fills screen height */
+    margin-left: var(--sidebar-width);
+    margin-top: 0;
+    min-height: 100vh;
     padding: 2rem;
     background-color: var(--bg-light);
 }

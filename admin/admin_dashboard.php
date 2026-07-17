@@ -28,13 +28,13 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Admin") {
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg main-navbar">
+    <!-- <nav class="navbar navbar-expand-lg main-navbar">
         <div class="container-fluid">
             <a class="navbar-brand" href="#" onclick="loadHomePage();">
                 Perinatal Care
             </a>
         </div>
-    </nav>
+    </nav> -->
 
     <div class="sidebar-container d-none d-lg-block">
         <nav class="sidebar-nav">
