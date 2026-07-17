@@ -121,63 +121,28 @@ $(document).on("click", " .delete_btn", function () {
 });
 //delete function->whole patient record
 
-//view button function
+//view button function -> now a full page instead of a modal
 $(document).on("click", ".view_btn", function () {
   let id = $(this).data("id");
-  //this is for basic patient info
-  $.ajax({
-    url: "patient/maternal/view_btn_maternal.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#modalContent").html(result);
-      $('#myModal').modal('show');
-      
-    }
-  });
+  loadPage('patient/maternal/view_patient_record.php?patient_id=' + id);
 });
 //view button function
 
-//view button function for pregnancy details
+//view button function for pregnancy details -> now a full page instead of a nested modal
 $(document).on("click", ".view_preg_btn", function () {
   let pregId = $(this).data("preg-id");
-  let pregNum = $(this). data("preg-num");
-  let dateCreated = $(this). data("date-created");
 
-  let title = 'Pregnancy # ' + pregNum + '( Date Created: ' + dateCreated + ')';
-  $('#pregnancyModalTitle').text(title);
-
-   $('#pregDetails').html('<div class="text-center">Loading details...</div>');
-
-  $.ajax({
-      url: "patient/maternal/view_preg_details.php",
-      method: "POST",
-      data: {pregnancy_id: pregId},
-      success: function (result) {
-        
-        $('#pregDetails').html(result);
-        $('#viewPregnancyRecord').modal('show');  
-      }
-  });
+  // close the outer basic-info modal first, then navigate to the page
+  $('#myModal').modal('hide');
+  loadPage('patient/maternal/view_pregnancy_record.php?pregnancy_id=' + pregId);
 });
 
 //view button function for pregnancy details
 
-//add pregnancy button function
+//add pregnancy button function -> reuses the same Medical Info page built for initial registration
 $(document).on("click", "#addPregnancyBtn", function () {
- 
   let patientId = $(this).data("patient-id");
-
-  $('#myModal').modal('hide');
-  //maglalagay loading
-  $('#main-content').load("patient/maternal/add_new_pregnancy.php?patient_id=" + patientId, function(response, status, xhr) {
-        if (status === "error") {
-            
-            $('#main-content').html('<div class="alert alert-danger">Error loading form. Check file path: patient/maternal/add_new_pregnancy.php</div>');
-        }
-    });
-
+  loadPage("patient/maternal/add_maternal_medical.php?patient_id=" + patientId);
 });
 //add pregnancy button function
 
@@ -215,3 +180,48 @@ $(document).on('click', '.js-back_button', function() {
 });
 
 //next and back button for add new pregnancy file
+//pregnancy list pagination (client-side, on view_patient_record.php)
+let pregnancyCurrentPage = 0;
+
+function renderPregnancyPage() {
+  $(".pregnancy-list-item").each(function () {
+    let itemPage = parseInt($(this).data("page"), 10);
+    $(this).toggle(itemPage === pregnancyCurrentPage);
+  });
+  $(".js-preg-page-indicator").text("Page " + (pregnancyCurrentPage + 1));
+}
+
+$(document).on("click", ".js-preg-next", function () {
+  let maxPage = 0;
+  $(".pregnancy-list-item").each(function () {
+    maxPage = Math.max(maxPage, parseInt($(this).data("page"), 10));
+  });
+  if (pregnancyCurrentPage < maxPage) {
+    pregnancyCurrentPage++;
+    renderPregnancyPage();
+  }
+});
+
+$(document).on("click", ".js-preg-prev", function () {
+  if (pregnancyCurrentPage > 0) {
+    pregnancyCurrentPage--;
+    renderPregnancyPage();
+  }
+});
+
+// Reset to page 0 and render as soon as the pregnancy list appears on the page
+const pregnancyListObserver = new MutationObserver(function () {
+  if (document.getElementById("pregnancy-list-container")) {
+    pregnancyCurrentPage = 0;
+    renderPregnancyPage();
+  }
+});
+pregnancyListObserver.observe(document.body, { childList: true, subtree: true });
+//pregnancy list pagination
+
+//add infant button function -> was previously unwired (dead button)
+$(document).on("click", "#addInfantBtn", function () {
+  let motherId = $(this).data("mother-id");
+  loadPage("redo-addPatient_info.php?mother_id=" + motherId);
+});
+//add infant button function

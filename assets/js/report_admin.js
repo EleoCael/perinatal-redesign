@@ -225,6 +225,62 @@ function togglePeriodFields() {
     }
 }
 
+function printReport() {
+    const selectedBarangays = Array.from(
+        document.querySelectorAll(".barangay-check:checked")
+    ).map((cb) => cb.value);
+
+    if (selectedBarangays.length === 0) {
+        alert("Please select at least one barangay and generate a report first.");
+        return;
+    }
+
+    const period = document.querySelector('input[name="period"]:checked')?.value;
+    const month = document.getElementById("month")?.value;
+    const quarter = document.getElementById("quarter")?.value;
+    const year = document.getElementById("year")?.value;
+
+    const params = new URLSearchParams({
+        action: currentReportType,
+        period: period,
+        month: month,
+        quarter: quarter,
+        year: year,
+        barangays: selectedBarangays.join(","),
+    });
+
+    window.open(`generate_pdf.php?${params}`, "_blank");
+}
+
+function exportExcel() {
+    const selectedBarangays = Array.from(
+        document.querySelectorAll(".barangay-check:checked")
+    ).map((cb) => cb.value);
+
+    if (selectedBarangays.length === 0) {
+        alert("Please select at least one barangay and generate a report first.");
+        return;
+    }
+
+    const period = document.querySelector('input[name="period"]:checked')?.value;
+    const month = document.getElementById("month")?.value;
+    const quarter = document.getElementById("quarter")?.value;
+    const year = document.getElementById("year")?.value;
+
+    const params = new URLSearchParams({
+        action: currentReportType,
+        period: period,
+        month: month,
+        quarter: quarter,
+        year: year,
+        barangays: selectedBarangays.join(","),
+    });
+
+    window.open(`generate_excel.php?${params}`, "_blank");
+}
+
+window.exportExcel = exportExcel;
+
 async function generateReport() {
     const selectedBarangays = Array.from(
         document.querySelectorAll(".barangay-check:checked")
@@ -436,6 +492,38 @@ function buildNutritionTable(data) {
         tbody.appendChild(tr);
     });
 }
+
+// ─── Manage Indicators form (admin) ───
+document.addEventListener("submit", function (e) {
+  const form = e.target.closest("#manageIndicatorsForm");
+  if (!form) return;
+  e.preventDefault();
+
+  const submitBtn = form.querySelector('[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
+  const formData = new FormData(form);
+  const reportType = formData.get("report_type");
+
+  fetch(form.action, { method: "POST", body: formData })
+    .then((response) => response.json())
+    .then((data) => {
+      if (submitBtn) submitBtn.disabled = false;
+
+      if (!data.success) {
+        alert("Error: " + (data.message || "Could not save changes."));
+        return;
+      }
+
+      alert("Indicators updated successfully.");
+      loadPage(`manage_indicators.php?report_type=${reportType}`);
+    })
+    .catch((err) => {
+      if (submitBtn) submitBtn.disabled = false;
+      console.error("Save indicators error:", err);
+      alert("Something went wrong saving your changes. Please try again.");
+    });
+});
 
 // Log when script loads
 console.log("✓ report_admin.js loaded successfully");

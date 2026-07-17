@@ -81,6 +81,46 @@ function setReportType(type) {
     event.target.classList.add('active');
 }
 
+function printReport() {
+    const period = document.querySelector('input[name="period"]:checked')?.value;
+    const month = document.getElementById('month')?.value;
+    const quarter = document.getElementById('quarter')?.value;
+    const year = document.getElementById('year')?.value;
+
+    if (!period || !year) {
+        alert('Please generate a report first.');
+        return;
+    }
+
+    let action = '';
+    if (currentReportType === 'maternal') action = 'prenatal';
+    else if (currentReportType === 'child') action = 'child';
+    else if (currentReportType === 'nutrition') action = 'nutrition';
+
+    const url = `/rhusystem/midwife/reports/generate_pdf.php?action=${action}&period=${period}&month=${month}&quarter=${quarter}&year=${year}`;
+    window.open(url, '_blank');
+}
+
+function exportExcel() {
+    const period = document.querySelector('input[name="period"]:checked')?.value;
+    const month = document.getElementById('month')?.value;
+    const quarter = document.getElementById('quarter')?.value;
+    const year = document.getElementById('year')?.value;
+
+    if (!period || !year) {
+        alert('Please generate a report first.');
+        return;
+    }
+
+    let action = '';
+    if (currentReportType === 'maternal') action = 'prenatal';
+    else if (currentReportType === 'child') action = 'child';
+    else if (currentReportType === 'nutrition') action = 'nutrition';
+
+    const url = `/rhusystem/midwife/reports/generate_excel.php?action=${action}&period=${period}&month=${month}&quarter=${quarter}&year=${year}`;
+    window.open(url, '_blank');
+}
+
 async function generateReport() {
     const period = document.querySelector('input[name="period"]:checked')?.value;
     const month = document.getElementById('month')?.value;

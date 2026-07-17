@@ -133,7 +133,7 @@ try {
         $_POST['anemia_status_remarks'],
         $given_iron,
         $_POST['given_iron_date'],
-        $_POST['maternal_screening_remark']
+        $_POST['remarks']
     );
 
     if (!$stmt_disease_screening->execute()) {

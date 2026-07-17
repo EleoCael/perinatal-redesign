@@ -2,7 +2,13 @@
 
 <div class="container-fluid">
     <div class="filter-card">
-        <h5 class="mb-3">Generate Multi-Barangay Report</h5>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Generate Multi-Barangay Report</h5>
+            <button class="btn btn-outline-secondary btn-sm" type="button"
+                    onclick="loadPage('manage_indicators.php?report_type=prenatal')">
+                <i class="bi bi-gear-fill"></i> Manage Indicators
+            </button>
+        </div>
         
         <div class="row mb-3">
             <div class="col-md-12">
@@ -94,9 +100,16 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label">&nbsp;</label>
-                <button class="btn btn-success w-100" onclick="window.print()">
-                    <i class="bi bi-printer-fill text-white"></i>
-                    Print
+                <button class="btn btn-outline-danger w-100" onclick="printReport()">
+                    <i class="bi bi-file-earmark-pdf-fill"></i>
+                    PDF
+                </button>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-outline-success w-100" onclick="exportExcel()">
+                    <i class="bi bi-file-earmark-excel-fill"></i>
+                    Excel
                 </button>
             </div>
         </div>
