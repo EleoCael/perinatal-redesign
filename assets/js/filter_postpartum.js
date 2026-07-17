@@ -1,11 +1,14 @@
 function selectData(filterValue){
     console.log('Filter selected:', filterValue);
+
+    // Fetch logic is redirected to fetch_postpartum_record.php
     
     // Store current filter
     window.currentFilter = filterValue;
+    fetchPostpartumData(1);
     
     // Always call the filter directly
-    loadFilteredMaternalRecords(filterValue);
+    // loadFilteredMaternalRecords(filterValue);
 }
 
 window.loadFilteredMaternalRecords = function(filterType) {

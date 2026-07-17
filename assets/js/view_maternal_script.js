@@ -1,19 +1,31 @@
 //search record
 function initialMaternalSearch(){
-
- // $('form').submit(function(event) {
-   //     event.preventDefault(); 
-    //});
+  observeMaternalInput();
 
   $('#search_maternal').on('keyup', searchRecord);
+}
 
-  $(document).on("click", "#pagination-container .page-link",  function (e) {
-    e.preventDefault();
-    let pageNumber = $(this).data("page");
-    if (pageNumber) {
-        fetchData(pageNumber);
-    }
-  });
+// Update the searchbar's placeholder text for different viewports
+function observeMaternalInput() {
+    const input = document.getElementById('search_maternal');
+
+    if (!input) return;
+
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width;
+
+        if (width < 180) {
+            input.placeholder = 'Search';
+        }
+        else if (width < 280) {
+            input.placeholder = 'Search Records';
+        }
+        else {
+            input.placeholder = 'Search Maternal Records';
+        }
+    });
+
+    observer.observe(input);
 }
 
 function searchRecord(){
@@ -29,7 +41,7 @@ function searchRecord(){
       data: {action: 'search_record', maternal_name: maternal_name},
       success: function (data) {
         $('#maternal_record_list').html(data);
-        $("#pagination-container").hide();
+        $("#maternal-pagination").hide();
       }, 
       error: function (xhr, status, error) {
         console.error("Search AJAX Error:", status, error);
@@ -41,7 +53,7 @@ function searchRecord(){
       loadFilteredMaternalRecords(window.currentFilter);
     } else {
       fetchData();
-      $("#pagination-container").show();
+      $("#maternal-pagination").show();
     }
   }
 }
@@ -54,18 +66,18 @@ function fetchData(page = 1) {
     url: "patient/maternal/fetch_maternal_record.php",
     method: "POST",
     dataType: "json",
-    data: { action: "fetchData", page: page },
+    data: { 
+      action: "fetchData", 
+      page: page,
+      filter_type: window.currentFilter || 'all' },
     success: function (response) {
       $("#maternal_record_list").html(response.table_data);
-
-      $("#pagination-container").html(response.pagination_links);
+      $("#maternal-pagination").html(response.pagination_links);
     },
     error: function (xhr, status, error) {
-      console.error("AJAX Error:", status, error);
-      $("#maternal_record_list").html(
-        "<tr><td colspan='7' class='text-center'>Error loading records.</td></tr>"
-      );
-    },
+        console.error("AJAX Error:", status, error);
+        console.log(xhr.responseText);
+    }
   });
 }
 
@@ -74,8 +86,19 @@ $(document).ready(function () {
 });
 //display records in table
 
+// Dropdown work-around because earlier methods couldn't get the menu to open :)
+$(document).on('click', '[data-bs-toggle="dropdown"]', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    bootstrap.Dropdown
+        .getOrCreateInstance(this)
+        .toggle();
+});
+// Dropdown work-around because earlier methods couldn't get the menu to open :)
+
 //pagination
-$(document).on("click", "#pagination-container .page-link", function (e) {
+$(document).on("click", "#maternal-pagination .page-link", function (e) {
   e.preventDefault();
   let pageNumber = $(this).data("page");
 
@@ -191,5 +214,4 @@ $(document).on('click', '.js-back_button', function() {
      $('html, body').animate({ scrollTop: 0 }, 'fast');
   }
 });
-
 //next and back button for add new pregnancy file
