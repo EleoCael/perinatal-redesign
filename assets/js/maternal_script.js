@@ -162,7 +162,7 @@ $(document).ready(function() {
 })();
 
 //for dynamic immunization form
-$(document).on("click", "#add_fim_field", function (e) {
+$(document).on("click", "#add_immunization_field", function (e) {
   e.preventDefault();
   $(".dynamic_immunization").append(`
             <div class="row g-3 mb-3 mt-2 align-items-center dynamic-row-immunization">

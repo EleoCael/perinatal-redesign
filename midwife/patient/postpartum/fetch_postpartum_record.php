@@ -74,12 +74,66 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_record') {
 if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
 
     // pagination
-    $limit = 15;
+    $limit = 10;
     $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
     $start = ($page - 1) * $limit;
 
+    $filter_type = $_POST['filter_type'] ?? 'all';
+
+    $additional_where = "p.patient_type = 'postpartum_mother' AND p.health_center_id = ?";
+    
+    // Build filter conditions
+    switch ($filter_type) {      
+        case 'complete_supplementation':
+            $additional_where .= " AND p.patient_id IN (
+                SELECT pps.patient_id
+                FROM post_partum_supp pps
+                INNER JOIN post_vitamin pv ON pps.patient_id = pv.patient_id
+                WHERE pps.patient_id = p.patient_id
+                AND pv.vitamin_a = 1
+                GROUP BY pps.patient_id
+                HAVING COUNT(DISTINCT CASE 
+                    WHEN pps.iron_folic_month_given IN ('1st month postpartum', '2nd month postpartum', '3rd month postpartum')
+                    THEN pps.iron_folic_month_given 
+                END) = 3
+            )";
+            break;
+            
+        case 'missing_iron_post':
+            $additional_where .= " AND p.patient_id NOT IN (
+                SELECT pps.patient_id
+                FROM post_partum_supp pps
+                WHERE pps.patient_id = p.patient_id
+                GROUP BY pps.patient_id
+                HAVING COUNT(DISTINCT CASE 
+                    WHEN pps.iron_folic_month_given IN ('1st month postpartum', '2nd month postpartum', '3rd month postpartum')
+                    THEN pps.iron_folic_month_given 
+                END) = 3
+            )";
+            break;
+            
+        case 'missing_vitA':
+            $additional_where .= " AND p.patient_id IN (
+                SELECT DISTINCT p2.patient_id 
+                FROM patient p2
+                LEFT JOIN post_vitamin pv ON p2.patient_id = pv.patient_id
+                WHERE p2.patient_id = p.patient_id
+                AND (
+                    pv.vitamin_a_id IS NULL OR
+                    pv.vitamin_a IS NULL OR 
+                    pv.vitamin_a = 0
+                )
+            )";
+            break;
+
+         case 'all':
+             default:
+      
+            break;
+    }
+
     // CRITICAL: Filter by health_center_id for count
-    $count_query = "SELECT count(*) AS total FROM patient WHERE patient_type = 'postpartum_mother' AND health_center_id = ?";
+    $count_query = "SELECT count(*) AS total FROM patient p WHERE $additional_where";
     $count_stmt = $conn->prepare($count_query);
     $count_stmt->bind_param('i', $health_center_id);
     $count_stmt->execute();
@@ -89,7 +143,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
     $pages = ceil($total_records / $limit);
 
     // CRITICAL: Filter by health_center_id in fetch query
-    $fetch_maternal_record = "SELECT * FROM patient WHERE patient_type = 'postpartum_mother' AND health_center_id = ? ORDER BY patient.patient_id ASC LIMIT ? OFFSET ?";
+    $fetch_maternal_record = "SELECT * FROM patient p 
+                            WHERE $additional_where 
+                            ORDER BY p.patient_id ASC 
+                            LIMIT ? OFFSET ?";
     $stmt = $conn->prepare($fetch_maternal_record);
     $stmt->bind_param("iii", $health_center_id, $limit, $start);
     $stmt->execute();
@@ -110,6 +167,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
 // pagination function
 function generatePaginationLinks($total_pages, $current_page): string
 {
+    if ($total_pages === 0) return '';
+
     $output = "";
     $output .= '<ul class="pagination justify-content-center">';
 
@@ -176,16 +235,42 @@ function getPostpartumData($result): string
                     <td>{$full_name}</td>
                     <td>{$address}</td>
                     <td>{$socio}</td>
-                    <td> 
+                    <td>
+                        <div class='d-none d-lg-flex gap-1'>
                         <button class='btn btn-sm btn-success view_postpartum_btn' data-id='{$patient_id}'>
                             <i class='bi bi-eye-fill' style='color: white;'></i>
                         </button>
                         <button class='btn btn-sm btn-primary edit_postpartum_btn' data-id='{$patient_id}'>
                             <i class='bi bi-pencil-square' style='color: white;'></i>
                         </button>
-                        <button class='btn btn-sm btn-danger delete_postpartum_btn' data-id='{$patient_id}'>
-                            <i class='bi bi-trash3-fill' style='color: white;'></i>
-                        </button>
+                        </div>
+                        <div class='dropdown d-lg-none'>
+                            <button
+                                class='btn btn-sm dropdown-toggle dropdown_postpartum_btn'
+                                type='button'
+                                data-bs-toggle='dropdown'
+                                aria-expanded='false'
+                            >
+                                <i class='bi bi-three-dots-vertical fs-4'></i>
+                            </button>
+
+                            <ul class='dropdown-menu'>
+                                <li>
+                                    <a class='dropdown-item view_postpartum_btn'
+                                    href='#'
+                                    data-id='{$patient_id}'>
+                                        View
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class='dropdown-item edit_postpartum_btn'
+                                    href='#'
+                                    data-id='{$patient_id}'>
+                                        Edit
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
             ";

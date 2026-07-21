@@ -28,8 +28,8 @@ function displayCheckbox($array, $key, $default = 'N/A')
     }
 }
 
-if (isset($_POST["patient_id"])) {
-    $patient_id = $_POST['patient_id'];
+if (isset($_GET["patient_id"])) {
+    $patient_id = $_GET['patient_id'];
     $health_center_id = $_SESSION['health_center_id'];
     $output = '';
 
@@ -188,6 +188,21 @@ foreach ($postpartum_supp as $post_iron_supp) {
     }
     //vitamin A
         $output .= " 
+        <div class='container-fluid'>
+    <div class='row'>
+        <div class='panel panel-default shadow-lg rounded'>
+            <div class='panel-heading'>
+                <div class='panel-body'>
+                    <div class='mt-3'>
+                        <a
+                            href='#'
+                            onclick='loadPage(`patient/postpartum/view_postpartum_record.php`); return false;'
+                            class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
+                            style='cursor: pointer;'
+                        >
+                            &lt; Back to Patients
+                        </a>
+                   </div>
                 <div class = 'table-responsive'>
                     <table class = 'table table-bordered'>
                         <tr>
@@ -305,7 +320,10 @@ foreach ($postpartum_supp as $post_iron_supp) {
                             </td>  
                         </tr>              
                     </table>
-               </div> 
+               </div>
+               </div>
+               </div>
+               </div>
             ";
     }
  echo $output;

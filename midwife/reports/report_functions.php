@@ -190,74 +190,91 @@ function getPrenatalIndicatorData($conn, $health_center_id, $indicator, $startDa
             return $data;
 
         case 'td_2doses':
+            
             $tdDoses2 = intval($threshold ?? 2);
-            $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                    FROM pregnancy p
-                    INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
-                    INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                    INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                    WHERE hc.health_center_id = ?
-                    AND p.date_terminated IS NOT NULL
-                    AND p.date_terminated != '0000-00-00'
-                    AND mi.immunization_date IS NOT NULL 
-                    AND mi.immunization_date != '0000-00-00'
-                    " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                    GROUP BY p.pregnancy_id, pt.age_bracket
-                    HAVING COUNT(DISTINCT mi.immunization_type) = {$tdDoses2}
-                    AND SUM(CASE WHEN mi.immunization_type IN ('Td1/TT1', 'Td2/TT2') THEN 1 ELSE 0 END) = {$tdDoses2}";
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT p.pregnancy_id, pt.age_bracket,
+                            MAX(mi.immunization_date) AS completion_date
+                        FROM pregnancy p
+                        INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
+                        INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                        INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                        WHERE mi.immunization_date IS NOT NULL
+                        AND mi.immunization_date != '0000-00-00'
+                        AND hc.health_center_id = ?
+                        GROUP BY p.pregnancy_id, pt.age_bracket
+                        HAVING COUNT(DISTINCT mi.immunization_type) = {$tdDoses2}
+                        AND SUM(CASE WHEN mi.immunization_type IN ('Td1/TT1', 'Td2/TT2') THEN 1 ELSE 0 END) = {$tdDoses2}
+                    ) completed
+                    WHERE 1=1 " . getDateCondition($period, 'completion_date', $year, $month, $quarter);
+            // existing fetch loop below stays exactly the same
             break;
 
         case 'td_3plus_doses':
+            // "At least N doses" — completion date is the date of her Nth dose
+            // chronologically, found via ROW_NUMBER, so extra doses after
+            // hitting the threshold don't shift her completion date later.
             $tdDoses3 = intval($threshold ?? 3);
-            $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                    FROM pregnancy p
-                    INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
-                    INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                    INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                    WHERE hc.health_center_id = ?
-                    AND p.date_terminated IS NOT NULL
-                    AND p.date_terminated != '0000-00-00'
-                    AND mi.immunization_date IS NOT NULL 
-                    AND mi.immunization_date != '0000-00-00'
-                    " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                    GROUP BY p.pregnancy_id, pt.age_bracket
-                    HAVING COUNT(DISTINCT mi.immunization_type) >= {$tdDoses3}";
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, immunization_date,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY immunization_date) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, mi.immunization_date
+                            FROM pregnancy p
+                            INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE mi.immunization_type IN ('Td1/TT1','Td2/TT2','Td3/TT3','Td4/TT4','Td5/TT5')
+                            AND mi.immunization_date IS NOT NULL
+                            AND mi.immunization_date != '0000-00-00'
+                            AND hc.health_center_id = ?
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$tdDoses3} " . getDateCondition($period, 'immunization_date', $year, $month, $quarter);
             break;
 
         case 'iron_folic':
             $ironDoses = intval($threshold ?? 4);
-            $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                    FROM pregnancy p
-                    INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
-                    INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                    INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                    WHERE hc.health_center_id = ?
-                    AND p.date_terminated IS NOT NULL
-                    AND p.date_terminated != '0000-00-00'
-                    AND ms.supplement_type = 'Iron Sulfate w/Folic Acid'
-                    AND ms.date_supp IS NOT NULL 
-                    AND ms.date_supp != '0000-00-00'
-                    " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                    GROUP BY p.pregnancy_id, pt.age_bracket
-                    HAVING COUNT(ms.maternal_supplement_id) = {$ironDoses}";
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, date_supp,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY date_supp) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, ms.date_supp
+                            FROM pregnancy p
+                            INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE ms.supplement_type = 'Iron Sulfate w/Folic Acid'
+                            AND ms.date_supp IS NOT NULL
+                            AND ms.date_supp != '0000-00-00'
+                            AND hc.health_center_id = ?
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$ironDoses} " . getDateCondition($period, 'date_supp', $year, $month, $quarter);
             break;
 
         case 'calcium':
             $calciumDoses = intval($threshold ?? 3);
-            $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                    FROM pregnancy p
-                    INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
-                    INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                    INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                    WHERE hc.health_center_id = ?
-                    AND p.date_terminated IS NOT NULL
-                    AND p.date_terminated != '0000-00-00'
-                    AND ms.supplement_type = 'Calcium Carbonate'
-                    AND ms.date_supp IS NOT NULL 
-                    AND ms.date_supp != '0000-00-00'
-                    " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                    GROUP BY p.pregnancy_id, pt.age_bracket
-                    HAVING COUNT(ms.maternal_supplement_id) = {$calciumDoses}";
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, date_supp,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY date_supp) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, ms.date_supp
+                            FROM pregnancy p
+                            INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE ms.supplement_type = 'Calcium Carbonate'
+                            AND ms.date_supp IS NOT NULL
+                            AND ms.date_supp != '0000-00-00'
+                            AND hc.health_center_id = ?
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$calciumDoses} " . getDateCondition($period, 'date_supp', $year, $month, $quarter);
             break;
 
         case 'iodine':

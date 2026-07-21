@@ -74,12 +74,116 @@ if (isset($_POST['action']) && $_POST['action'] == 'search_record') {
 
 // fetch infant data
 if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
-    $limit = 15;
+    $limit = 10;
     $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
     $start = ($page - 1) * $limit;
 
+    $filter_type = $_POST['filter_type'] ?? 'all';
+
+    // Add filter conditions
+    $additional_where = "p.patient_type = 'infant' AND p.health_center_id = ?";
+
+    switch ($filter_type) {
+        case 'no_immunization':
+            $additional_where .= " AND (
+                bcg.bcg_check IS NULL OR bcg.bcg_check = 0)
+                AND hepab.hepaB_day IS NULL
+                AND pentavalent.pentavalent_type IS NULL";
+            break;
+        
+        case 'incomplete_immunization':
+            $additional_where .= " AND (
+                (bcg.bcg_check IS NULL OR bcg.bcg_check = 0) OR
+                hepab.hepaB_day IS NULL OR
+                (pentavalent.pentavalent_type IS NULL OR pentavalent.pentavalent_type != 'Pentavalent 3') OR
+                (opv.opv_type IS NULL OR opv.opv_type != 'Opv 3') OR
+                (ipv.ipv_1 IS NULL OR ipv.ipv_1 = 0) OR
+                mcv.mcv_type IS NULL
+            )";
+            break;
+        
+        case 'complete_immunization':
+            $additional_where .= " AND bcg.bcg_check = 1
+                                    AND hepab.hepaB_day IS NOT NULL
+                                    AND pentavalent.pentavalent_type = 'Pentavalent 3'
+                                    AND opv.opv_type = 'Opv 3'
+                                    AND ipv.ipv_1 = 1
+                                    AND mcv.mcv_type IS NOT NULL";
+            break;
+        
+        case 'complete_supplementation':
+            $additional_where .= " AND vai.vitamin_type IS NOT NULL
+                                    AND ii.iron_type IS NOT NULL
+                                    AND di.deworming_check = 1";
+            break;
+        
+        case 'missing_bcg':
+            $additional_where .= " AND (bcg.bcg_check IS NULL OR bcg.bcg_check = 0)";
+            break;
+        
+        case 'missing_hepaB':
+            $additional_where .= " AND hepab.hepaB_day IS NULL";
+            break;
+        
+        case 'incomplete_pentavalent':
+            $additional_where .= " AND (pentavalent.pentavalent_type IS NULL OR pentavalent.pentavalent_type != 'Pentavalent 3')";
+            break;
+        
+        case 'incomplete_opv':
+            $additional_where .= " AND (opv.opv_type IS NULL OR opv.opv_type != 'Opv 3')";
+            break;
+        
+        case 'missing_ipv':
+            $additional_where .= " AND (ipv.ipv_1 IS NULL OR ipv.ipv_1 = 0)";
+            break;
+        
+        case 'incomplete_mcv':
+            $additional_where .= " AND (mcv.mcv_type IS NULL OR mcv.mcv_type != 'MCV2 (MMR)')";
+            break;
+        
+        case 'incomplete_rvv':
+            $additional_where .= " AND (rvv.rvv_type IS NULL OR rvv.rvv_type != 'Rota Virus Vaccine 2')";
+            break;
+        
+        case 'incomplete_pcv':
+            $additional_where .= " AND (pcv.pcv_type IS NULL OR pcv.pcv_type != 'PCV 3')";
+            break;
+        
+        case 'incomplete_vitA':
+            $additional_where .= " AND vai.vitamin_type IS NULL";
+            break;
+        
+        case 'incomplete_iron':
+            $additional_where .= " AND ii.iron_type IS NULL";
+            break;
+        
+        case 'missing_deworming':
+            $additional_where .= " AND (di.deworming_check IS NULL OR di.deworming_check = 0)";
+            break;
+        
+        case 'all':
+        default:
+            // No additional filter
+            break;
+    }
+
     // CRITICAL: Filter by health_center_id for count
-    $count_query = "SELECT COUNT(*) AS total FROM patient WHERE patient_type = 'infant' AND health_center_id = ?";
+    $count_query = "SELECT COUNT(DISTINCT p.patient_id) AS total
+        FROM patient p
+        LEFT JOIN bcg ON p.patient_id = bcg.patient_id
+        LEFT JOIN hepab ON p.patient_id = hepab.patient_id
+        LEFT JOIN pentavalent ON p.patient_id = pentavalent.patient_id
+        LEFT JOIN opv ON p.patient_id = opv.patient_id
+        LEFT JOIN ipv ON p.patient_id = ipv.patient_id
+        LEFT JOIN mcv ON p.patient_id = mcv.patient_id
+        LEFT JOIN rota_virus_vaccine rvv ON p.patient_id = rvv.patient_id
+        LEFT JOIN pcv ON p.patient_id = pcv.patient_id
+        LEFT JOIN vitamin_a_infant vai ON p.patient_id = vai.patient_id
+        LEFT JOIN iron_infant ii ON p.patient_id = ii.patient_id
+        LEFT JOIN deworming_infant di ON p.patient_id = di.patient_id
+        WHERE $additional_where
+    ";
+
     $count_stmt = $conn->prepare($count_query);
     $count_stmt->bind_param('i', $health_center_id);
     $count_stmt->execute();
@@ -89,7 +193,24 @@ if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
     $pages = ceil($total_records / $limit);
 
     // CRITICAL: Filter by health_center_id in fetch query
-    $fetch_query = "SELECT * FROM patient WHERE patient_type = 'infant' AND health_center_id = ? ORDER BY patient_id ASC LIMIT ? OFFSET ?";
+    $fetch_query = "SELECT DISTINCT p.*
+        FROM patient p
+        LEFT JOIN bcg ON p.patient_id = bcg.patient_id
+        LEFT JOIN hepab ON p.patient_id = hepab.patient_id
+        LEFT JOIN pentavalent ON p.patient_id = pentavalent.patient_id
+        LEFT JOIN opv ON p.patient_id = opv.patient_id
+        LEFT JOIN ipv ON p.patient_id = ipv.patient_id
+        LEFT JOIN mcv ON p.patient_id = mcv.patient_id
+        LEFT JOIN rota_virus_vaccine rvv ON p.patient_id = rvv.patient_id
+        LEFT JOIN pcv ON p.patient_id = pcv.patient_id
+        LEFT JOIN vitamin_a_infant vai ON p.patient_id = vai.patient_id
+        LEFT JOIN iron_infant ii ON p.patient_id = ii.patient_id
+        LEFT JOIN deworming_infant di ON p.patient_id = di.patient_id
+        WHERE $additional_where
+        ORDER BY p.patient_id ASC
+        LIMIT ? OFFSET ?
+    ";
+
     $stmt = $conn->prepare($fetch_query);
     $stmt->bind_param("iii", $health_center_id, $limit, $start);
     $stmt->execute();
@@ -104,12 +225,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'fetchData') {
         'table_data' => $table_data,
         'pagination_links' => $pagination_links
     ]);
+
     exit();
 }
 
 // --- FUNCTIONS ---
 
 function generatePaginationLinks($total_pages, $current_page): string {
+    if ($total_pages == 0) return "";
+
     $output = '<ul class="pagination justify-content-center">';
     $prev_disabled = ($current_page <= 1) ? 'disabled' : '';
     $output .= "<li class='page-item $prev_disabled'><a class='page-link' href='#' data-page='" . ($current_page - 1) . "'>&laquo;</a></li>";
@@ -169,15 +293,41 @@ function getInfantData($result): string {
                     <td>{$mother_name}</td>
                     <td>{$socio_status}</td>
                     <td>
-                        <button class='btn btn-sm btn-success view_infant_btn' data-id='{$patient_id}'>
-                            <i class='bi bi-eye-fill' style='color:white;'></i>
-                        </button>
-                        <button class='btn btn-sm btn-primary edit_infant_btn' data-id='{$patient_id}'>
-                            <i class='bi bi-pencil-square' style='color:white;'></i>
-                        </button>
-                        <button class='btn btn-sm btn-danger delete_infant_btn' data-id='{$patient_id}'>
-                            <i class='bi bi-trash3-fill' style='color:white;'></i>
-                        </button>
+                        <div class='d-none d-lg-flex gap-1'>
+                            <button class='btn btn-sm btn-success view_infant_btn' data-id='{$patient_id}'>
+                                <i class='bi bi-eye-fill' style='color:white;'></i>
+                            </button>
+                            <button class='btn btn-sm btn-primary edit_infant_btn' data-id='{$patient_id}'>
+                                <i class='bi bi-pencil-square' style='color:white;'></i>
+                            </button>
+                        </div>
+                        <div class='dropdown d-lg-none'>
+                            <button
+                                class='btn btn-sm dropdown-toggle dropdown_infant_btn'
+                                type='button'
+                                data-bs-toggle='dropdown'
+                                aria-expanded='false'
+                            >
+                                <i class='bi bi-three-dots-vertical fs-4'></i>
+                            </button>
+
+                            <ul class='dropdown-menu'>
+                                <li>
+                                    <a class='dropdown-item view_infant_btn'
+                                    href='#'
+                                    data-id='{$patient_id}'>
+                                        View
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class='dropdown-item edit_infant_btn'
+                                    href='#'
+                                    data-id='{$patient_id}'>
+                                        Edit
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
             ";

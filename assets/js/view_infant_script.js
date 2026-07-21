@@ -1,5 +1,7 @@
 // Search function
 function initialInfantSearch() {
+  observeInfantInput();
+
     
   $("form").submit(function (event) {
     event.preventDefault();
@@ -7,7 +9,7 @@ function initialInfantSearch() {
 
   $("#search_infant").on("keyup", searchInfantRecord);
 
-  $(document).on("click", "#pagination-container .page-link", function (e) {
+  $(document).on("click", "#infant-pagination .page-link", function (e) {
     e.preventDefault();
     let pageNumber = $(this).data("page");
     if (pageNumber) {
@@ -25,7 +27,7 @@ function searchInfantRecord() {
       data: { action: "search_record", infant_name: infant_name },
       success: function (data) {
         $("#infant_record_list").html(data);
-        $("#pagination-container").hide();
+        $("#infant-pagination").hide();
       },
       error: function (xhr, status, error) {
         console.error("Search AJAX Error:", status, error);
@@ -33,21 +35,49 @@ function searchInfantRecord() {
     });
   } else {
     fetchInfantData();
-    $("#pagination-container").show();
+    $("#infant-pagination").show();
   }
+}
+
+// Dynamic searchbar
+function observeInfantInput() {
+    const input = document.getElementById('search_infant');
+
+    if (!input) return;
+
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width;
+
+        if (width < 180) {
+            input.placeholder = 'Search';
+        }
+        else if (width < 280) {
+            input.placeholder = 'Search Records';
+        }
+        else {
+            input.placeholder = 'Search Infant Records';
+        }
+    });
+
+    observer.observe(input);
 }
 
 // Fetch infant records
 function fetchInfantData(page = 1) {
+    console.log("Current Filter:", window.currentFilter);
+
      console.log("Fetching infant data for page:", page);
   $.ajax({
     url: "patient/infant/fetch_infant_record.php",
     method: "POST",
     dataType: "json",
-    data: { action: "fetchData", page: page },
+    data: { 
+      action: "fetchData", 
+      page: page,
+      filter_type: window.currentFilter || 'all' },
     success: function (response) {
       $("#infant_record_list").html(response.table_data);
-      $("#pagination-container").html(response.pagination_links);
+      $("#infant-pagination").html(response.pagination_links);
     },
     error: function (xhr, status, error) {
       console.error("AJAX Error:", status, error);
@@ -62,7 +92,7 @@ $(document).ready(function () {
   fetchInfantData();
 });
 
-$(document).on("click", "#pagination-container .page-link", function (e) {
+$(document).on("click", "#infant-pagination .page-link", function (e) {
   e.preventDefault();
   let pageNumber = $(this).data("page");
   if (pageNumber) fetchInfantData(pageNumber);
@@ -102,17 +132,10 @@ $(document).on("click", ".delete_infant_btn", function () {
 //view button function
 $(document).on("click", ".view_infant_btn", function () {
   let id = $(this).data("id");
+
   //this is for basic patient info
-  $.ajax({
-    url: "patient/infant/view_btn_infant.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#infantModalContent").html(result);
-      $('#myInfantModal').modal('show');
-      
-    }
-  });
+  loadPage(
+        "patient/infant/view_btn_infant.php?patient_id=" + id
+    );
 });
 //view button function

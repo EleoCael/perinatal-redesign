@@ -1,19 +1,31 @@
 //search record
 function initialMaternalSearch(){
-
- // $('form').submit(function(event) {
-   //     event.preventDefault(); 
-    //});
+  observeMaternalInput();
 
   $('#search_maternal').on('keyup', searchRecord);
+}
 
-  $(document).on("click", "#pagination-container .page-link",  function (e) {
-    e.preventDefault();
-    let pageNumber = $(this).data("page");
-    if (pageNumber) {
-        fetchData(pageNumber);
-    }
-  });
+// Update the searchbar's placeholder text for different viewports
+function observeMaternalInput() {
+    const input = document.getElementById('search_maternal');
+
+    if (!input) return;
+
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width;
+
+        if (width < 180) {
+            input.placeholder = 'Search';
+        }
+        else if (width < 280) {
+            input.placeholder = 'Search Records';
+        }
+        else {
+            input.placeholder = 'Search Maternal Records';
+        }
+    });
+
+    observer.observe(input);
 }
 
 function searchRecord(){
@@ -29,7 +41,7 @@ function searchRecord(){
       data: {action: 'search_record', maternal_name: maternal_name},
       success: function (data) {
         $('#maternal_record_list').html(data);
-        $("#pagination-container").hide();
+        $("#maternal-pagination").hide();
       }, 
       error: function (xhr, status, error) {
         console.error("Search AJAX Error:", status, error);
@@ -41,7 +53,7 @@ function searchRecord(){
       loadFilteredMaternalRecords(window.currentFilter);
     } else {
       fetchData();
-      $("#pagination-container").show();
+      $("#maternal-pagination").show();
     }
   }
 }
@@ -54,18 +66,18 @@ function fetchData(page = 1) {
     url: "patient/maternal/fetch_maternal_record.php",
     method: "POST",
     dataType: "json",
-    data: { action: "fetchData", page: page },
+    data: { 
+      action: "fetchData", 
+      page: page,
+      filter_type: window.currentFilter || 'all' },
     success: function (response) {
       $("#maternal_record_list").html(response.table_data);
-
-      $("#pagination-container").html(response.pagination_links);
+      $("#maternal-pagination").html(response.pagination_links);
     },
     error: function (xhr, status, error) {
-      console.error("AJAX Error:", status, error);
-      $("#maternal_record_list").html(
-        "<tr><td colspan='7' class='text-center'>Error loading records.</td></tr>"
-      );
-    },
+        console.error("AJAX Error:", status, error);
+        console.log(xhr.responseText);
+    }
   });
 }
 
@@ -74,8 +86,19 @@ $(document).ready(function () {
 });
 //display records in table
 
+// Dropdown work-around because earlier methods couldn't get the menu to open :)
+$(document).on('click', '[data-bs-toggle="dropdown"]', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    bootstrap.Dropdown
+        .getOrCreateInstance(this)
+        .toggle();
+});
+// Dropdown work-around because earlier methods couldn't get the menu to open :)
+
 //pagination
-$(document).on("click", "#pagination-container .page-link", function (e) {
+$(document).on("click", "#maternal-pagination .page-link", function (e) {
   e.preventDefault();
   let pageNumber = $(this).data("page");
 
@@ -121,28 +144,41 @@ $(document).on("click", " .delete_btn", function () {
 });
 //delete function->whole patient record
 
-//view button function -> now a full page instead of a modal
+//view button function
 $(document).on("click", ".view_btn", function () {
   let id = $(this).data("id");
-  loadPage('patient/maternal/view_patient_record.php?patient_id=' + id);
+  //this is for basic patient info
+  loadPage(
+    'patient/maternal/view_btn_maternal.php?patient_id=' + id
+  );
 });
 //view button function
 
-//view button function for pregnancy details -> now a full page instead of a nested modal
+//view button function for pregnancy details
 $(document).on("click", ".view_preg_btn", function () {
-  let pregId = $(this).data("preg-id");
+    let pregId = $(this).data("preg-id");
 
-  // close the outer basic-info modal first, then navigate to the page
-  $('#myModal').modal('hide');
-  loadPage('patient/maternal/view_pregnancy_record.php?pregnancy_id=' + pregId);
+    loadPage(
+        "patient/maternal/view_preg_details.php?pregnancy_id=" + pregId
+    );
 });
 
 //view button function for pregnancy details
 
-//add pregnancy button function -> reuses the same Medical Info page built for initial registration
+//add pregnancy button function
 $(document).on("click", "#addPregnancyBtn", function () {
+ 
   let patientId = $(this).data("patient-id");
-  loadPage("patient/maternal/add_maternal_medical.php?patient_id=" + patientId);
+
+  $('#myModal').modal('hide');
+  //maglalagay loading
+  $('#main-content').load("patient/maternal/add_new_pregnancy.php?patient_id=" + patientId, function(response, status, xhr) {
+        if (status === "error") {
+            
+            $('#main-content').html('<div class="alert alert-danger">Error loading form. Check file path: patient/maternal/add_new_pregnancy.php</div>');
+        }
+    });
+
 });
 //add pregnancy button function
 
@@ -178,50 +214,4 @@ $(document).on('click', '.js-back_button', function() {
      $('html, body').animate({ scrollTop: 0 }, 'fast');
   }
 });
-
 //next and back button for add new pregnancy file
-//pregnancy list pagination (client-side, on view_patient_record.php)
-let pregnancyCurrentPage = 0;
-
-function renderPregnancyPage() {
-  $(".pregnancy-list-item").each(function () {
-    let itemPage = parseInt($(this).data("page"), 10);
-    $(this).toggle(itemPage === pregnancyCurrentPage);
-  });
-  $(".js-preg-page-indicator").text("Page " + (pregnancyCurrentPage + 1));
-}
-
-$(document).on("click", ".js-preg-next", function () {
-  let maxPage = 0;
-  $(".pregnancy-list-item").each(function () {
-    maxPage = Math.max(maxPage, parseInt($(this).data("page"), 10));
-  });
-  if (pregnancyCurrentPage < maxPage) {
-    pregnancyCurrentPage++;
-    renderPregnancyPage();
-  }
-});
-
-$(document).on("click", ".js-preg-prev", function () {
-  if (pregnancyCurrentPage > 0) {
-    pregnancyCurrentPage--;
-    renderPregnancyPage();
-  }
-});
-
-// Reset to page 0 and render as soon as the pregnancy list appears on the page
-const pregnancyListObserver = new MutationObserver(function () {
-  if (document.getElementById("pregnancy-list-container")) {
-    pregnancyCurrentPage = 0;
-    renderPregnancyPage();
-  }
-});
-pregnancyListObserver.observe(document.body, { childList: true, subtree: true });
-//pregnancy list pagination
-
-//add infant button function -> was previously unwired (dead button)
-$(document).on("click", "#addInfantBtn", function () {
-  let motherId = $(this).data("mother-id");
-  loadPage("redo-addPatient_info.php?mother_id=" + motherId);
-});
-//add infant button function

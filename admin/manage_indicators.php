@@ -15,17 +15,18 @@ $stmt->bind_param("s", $report_type);
 $stmt->execute();
 $indicators = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+
 ?>
 
 <div class="container-fluid">
     <div class="filter-card">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="mb-0">Manage Report Indicators</h5>
-            <button class="btn btn-outline-secondary btn-sm" type="button"
-                    onclick="loadPage('report_dashboard.php')">
-                <i class="bi bi-arrow-left"></i> Back to Reports
-            </button>
-        </div>
+    <h5 class="mb-0">Manage Report Indicators</h5>
+    <button class="btn btn-outline-secondary btn-sm" type="button"
+            onclick="loadPage('report_dashboard.php')">
+        <i class="bi bi-arrow-left"></i> Back to Reports
+    </button>
+</div>
         <p class="text-muted">
             Edit the wording, order, active state, and thresholds used in your generated reports.
             Changing these here updates the report immediately — no code changes needed.
@@ -34,8 +35,10 @@ $stmt->close();
         <div class="mb-3">
             <a href="#" class="btn btn-sm btn-outline-primary <?php echo $report_type === 'prenatal' ? 'active' : ''; ?>"
                onclick="loadPage('manage_indicators.php?report_type=prenatal'); return false;">Prenatal Care</a>
-            <a href="#" class="btn btn-sm btn-outline-secondary disabled" title="Coming soon">Infant Care & Immunization</a>
-            <a href="#" class="btn btn-sm btn-outline-secondary disabled" title="Coming soon">Nutrition Services</a>
+            <a href="#" class="btn btn-sm btn-outline-primary <?php echo $report_type === 'child' ? 'active' : ''; ?>"
+             onclick="loadPage('manage_indicators.php?report_type=child'); return false;">Infant Care & Immunization</a>
+            <a href="#" class="btn btn-sm btn-outline-primary <?php echo $report_type === 'nutrition' ? 'active' : ''; ?>"
+                onclick="loadPage('manage_indicators.php?report_type=nutrition'); return false;">Nutrition Services</a>
         </div>
 
         <form id="manageIndicatorsForm" action="/rhusystem/admin/manage_indicators_process.php" method="POST">
@@ -45,20 +48,23 @@ $stmt->close();
                 <table class="table table-bordered align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 45%;">Label</th>
-                            <th style="width: 12%;">Threshold</th>
-                            <th style="width: 10%;">Order</th>
-                            <th style="width: 8%;">Active</th>
-                            <th>Indicator Key <small class="text-muted">(read-only, ties to report logic)</small></th>
+                            <th style="width: 8%; font-size: 0.75rem;" class="text-muted"><i class="bi bi-arrow-down-up text-muted"></i>Reorder</th>
+                            <th style="width: 57%;">Label</th>
+                            <th style="width: 20%;">Threshold</th>
+                            <th style="width: 15%;" class="text-center">Active</th>
+                            
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach ($indicators as $ind): ?>
-                        <tr>
+                    <tbody id="indicatorRows">
+                       <?php foreach ($indicators as $ind): ?>
+                        <tr data-indicator-id="<?php echo $ind['indicator_id']; ?>">
+                            <td class="text-center" style="cursor: grab;">
+                                <i class="bi bi-grip-vertical text-muted drag-handle"></i>
+                            </td>
                             <td>
                                 <input type="text" class="form-control form-control-sm"
-                                       name="indicator[<?php echo $ind['indicator_id']; ?>][label_template]"
-                                       value="<?php echo htmlspecialchars($ind['label_template']); ?>">
+                                    name="indicator[<?php echo $ind['indicator_id']; ?>][label_template]"
+                                    value="<?php echo htmlspecialchars($ind['label_template']); ?>">
                                 <?php if (strpos($ind['label_template'], '{threshold}') !== false): ?>
                                     <small class="text-muted">Uses <code>{threshold}</code> as a placeholder for the number on the right.</small>
                                 <?php endif; ?>
@@ -72,17 +78,12 @@ $stmt->close();
                                     <span class="text-muted">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
-                                <input type="number" class="form-control form-control-sm"
-                                       name="indicator[<?php echo $ind['indicator_id']; ?>][display_order]"
-                                       value="<?php echo htmlspecialchars($ind['display_order']); ?>">
-                            </td>
                             <td class="text-center">
                                 <input type="checkbox" class="form-check-input"
                                        name="indicator[<?php echo $ind['indicator_id']; ?>][is_active]"
                                        value="1" <?php echo $ind['is_active'] ? 'checked' : ''; ?>>
                             </td>
-                            <td><code><?php echo htmlspecialchars($ind['indicator_key']); ?></code></td>
+                        
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -91,5 +92,7 @@ $stmt->close();
 
             <button type="submit" class="btn btn-primary">Save Changes</button>
         </form>
+        
     </div>
 </div>
+

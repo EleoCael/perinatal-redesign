@@ -83,31 +83,20 @@ function getChildReport($conn, $barangays, $period, $month, $year, $quarter)
     $title = generateTitle('Infant Care & Immunization Report', $period, $month, $year, $quarter, $conn, $barangays);
     $reportData = [];
 
-    $indicators = [
-        ['key' => 'cpab', 'label' => '1. CPAB - Total'],
-        ['key' => 'bcg', 'label' => '2. BCG - Total'],
-        ['key' => 'hepb_24h', 'label' => '3. Hepatitis B within 24 hours - Total'],
-        ['key' => 'hepb_after_24h', 'label' => '4. Hepatitis B after 24 hours - Total'],
-        ['key' => 'pentavalent_1', 'label' => '5. DPT-HIB-HepB 1 - Total'],
-        ['key' => 'pentavalent_2', 'label' => '6. DPT-HIB-HepB 2 - Total'],
-        ['key' => 'pentavalent_3', 'label' => '7. DPT-HIB-HepB 3 - Total'],
-        ['key' => 'opv_1', 'label' => '8. OPV 1 - Total'],
-        ['key' => 'opv_2', 'label' => '9. OPV 2 - Total'],
-        ['key' => 'opv_3', 'label' => '10. OPV 3 - Total'],
-        ['key' => 'ipv_1', 'label' => '11. IPV 1 (routine) - Total'],
-        ['key' => 'pcv_1', 'label' => '12. PCV 1 - Total'],
-        ['key' => 'pcv_2', 'label' => '13. PCV 2 - Total'],
-        ['key' => 'pcv_3', 'label' => '14. PCV 3 - Total'],
-        ['key' => 'mcv_1', 'label' => '15. MCV 1 (AMV) - Total'],
-        ['key' => 'mcv_2', 'label' => '16. MCV 2 (MMR) - Total'],
-        ['key' => 'fic', 'label' => '17. FIC - Fully Immunized Child - Total'],
-    ];
+    $stmt = $conn->prepare("SELECT indicator_key, label_template, threshold_value 
+                             FROM report_indicators 
+                             WHERE report_type = 'child' AND is_active = 1 
+                             ORDER BY display_order ASC");
+    $stmt->execute();
+    $indicators = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 
     foreach ($indicators as $indicator) {
-        $data = getChildIndicatorData($conn, $barangays, $indicator['key'], $period, $year, $month, $quarter);
+        $label = str_replace('{threshold}', $indicator['threshold_value'] ?? '', $indicator['label_template']);
+        $data = getChildIndicatorData($conn, $barangays, $indicator['indicator_key'], $period, $year, $month, $quarter);
 
         $reportData[] = [
-            'indicator' => $indicator['label'],
+            'indicator' => $label,
             'male' => $data['male'] ?? 0,
             'female' => $data['female'] ?? 0,
             'total' => ($data['male'] ?? 0) + ($data['female'] ?? 0)
@@ -122,22 +111,20 @@ function getNutritionReport($conn, $barangays, $period, $month, $year, $quarter)
     $title = generateTitle('Nutrition Services Report', $period, $month, $year, $quarter, $conn, $barangays);
     $reportData = [];
 
-    $indicators = [
-        ['key' => 'bf_initiated', 'label' => '1. Newborns initiated on breastfeeding within 90 minutes - Total'],
-        ['key' => 'lbw_iron', 'label' => '2. Preterm/LBW infants given iron supplementation - Total'],
-        ['key' => 'ebf_6month', 'label' => '3. Infants exclusively breastfed until 6 months and 29 days- Total'],
-        ['key' => 'compl_feeding_6month', 'label' => '4. Infants 6 months old initiated to complementary feeding with continued BF - Total'],
-        ['key' => 'compl_no_bf', 'label' => '5. Infants 6 months initiated complementary feeding but no longer or never been breastfed - Total'],
-        ['key' => 'vit_a_6_11m', 'label' => '5. Infants 6–11 months  given 1 dose of Vitamin A (100,000 IU) - Total'],
-        ['key' => 'mnp_6_11m', 'label' => '6. Infants 6–11 months who completed MNP supplementation - Total'],
-        ['key' => 'deworming', 'label' => '8. Infants given deworming - Total'],
-    ];
+    $stmt = $conn->prepare("SELECT indicator_key, label_template, threshold_value 
+                             FROM report_indicators 
+                             WHERE report_type = 'nutrition' AND is_active = 1 
+                             ORDER BY display_order ASC");
+    $stmt->execute();
+    $indicators = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
 
     foreach ($indicators as $indicator) {
-        $data = getNutritionIndicatorData($conn, $barangays, $indicator['key'], $period, $year, $month, $quarter);
+        $label = str_replace('{threshold}', $indicator['threshold_value'] ?? '', $indicator['label_template']);
+        $data = getNutritionIndicatorData($conn, $barangays, $indicator['indicator_key'], $period, $year, $month, $quarter);
 
         $reportData[] = [
-            'indicator' => $indicator['label'],
+            'indicator' => $label,
             'male' => $data['male'] ?? 0,
             'female' => $data['female'] ?? 0,
             'total' => ($data['male'] ?? 0) + ($data['female'] ?? 0)
@@ -238,73 +225,94 @@ function getPrenatalIndicatorData($conn, $barangays, $indicator, $period, $year,
             break;
 
         case 'td_2doses':
-        // Attributed to delivery month (p.date_terminated), counting doses
-        // across the whole pregnancy — same fix pattern as checkups_4plus.
-        $tdDoses2 = intval($threshold ?? 2);
-        $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                FROM pregnancy p
-                INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
-                INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                WHERE p.date_terminated IS NOT NULL
-                AND p.date_terminated != '0000-00-00'
-                AND mi.immunization_date IS NOT NULL 
-                AND mi.immunization_date != '0000-00-00'
-                " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                $barangayFilter
-                GROUP BY p.pregnancy_id, pt.age_bracket
-                HAVING COUNT(DISTINCT mi.immunization_type) = {$tdDoses2}
-                AND SUM(CASE WHEN mi.immunization_type IN ('Td1/TT1', 'Td2/TT2') THEN 1 ELSE 0 END) = {$tdDoses2}";
+            // Counted as soon as she has exactly Td1+Td2 — attributed to the
+            // date of the later of the two doses (when she "completed" it),
+            // NOT delivery date. No date_terminated requirement anymore.
+            $tdDoses2 = intval($threshold ?? 2);
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT p.pregnancy_id, pt.age_bracket,
+                            MAX(mi.immunization_date) AS completion_date
+                        FROM pregnancy p
+                        INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
+                        INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                        INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                        WHERE mi.immunization_date IS NOT NULL
+                        AND mi.immunization_date != '0000-00-00'
+                        $barangayFilter
+                        GROUP BY p.pregnancy_id, pt.age_bracket
+                        HAVING COUNT(DISTINCT mi.immunization_type) = {$tdDoses2}
+                        AND SUM(CASE WHEN mi.immunization_type IN ('Td1/TT1', 'Td2/TT2') THEN 1 ELSE 0 END) = {$tdDoses2}
+                    ) completed
+                    WHERE 1=1 " . getDateCondition($period, 'completion_date', $year, $month, $quarter);
+            // existing fetch loop below stays exactly the same
+            break;
 
         case 'td_3plus_doses':
-        $tdDoses3 = intval($threshold ?? 3);
-        $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                FROM pregnancy p
-                INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
-                INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                WHERE p.date_terminated IS NOT NULL
-                AND p.date_terminated != '0000-00-00'
-                AND mi.immunization_date IS NOT NULL 
-                AND mi.immunization_date != '0000-00-00'
-                " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                $barangayFilter
-                GROUP BY p.pregnancy_id, pt.age_bracket
-                HAVING COUNT(DISTINCT mi.immunization_type) >= {$tdDoses3}";
+            // "At least N doses" — completion date is the date of her Nth dose
+            // chronologically, found via ROW_NUMBER, so extra doses after
+            // hitting the threshold don't shift her completion date later.
+            $tdDoses3 = intval($threshold ?? 3);
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, immunization_date,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY immunization_date) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, mi.immunization_date
+                            FROM pregnancy p
+                            INNER JOIN maternal_immunization mi ON p.pregnancy_id = mi.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE mi.immunization_type IN ('Td1/TT1','Td2/TT2','Td3/TT3','Td4/TT4','Td5/TT5')
+                            AND mi.immunization_date IS NOT NULL
+                            AND mi.immunization_date != '0000-00-00'
+                            $barangayFilter
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$tdDoses3} " . getDateCondition($period, 'immunization_date', $year, $month, $quarter);
+            break;
 
         case 'iron_folic':
-        $ironDoses = intval($threshold ?? 4);
-        $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                FROM pregnancy p
-                INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
-                INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                WHERE p.date_terminated IS NOT NULL
-                AND p.date_terminated != '0000-00-00'
-                AND ms.supplement_type = 'Iron Sulfate w/Folic Acid'
-                AND ms.date_supp IS NOT NULL 
-                AND ms.date_supp != '0000-00-00'
-                " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                $barangayFilter
-                GROUP BY p.pregnancy_id, pt.age_bracket
-                HAVING COUNT(ms.maternal_supplement_id) = {$ironDoses}";
+            $ironDoses = intval($threshold ?? 4);
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, date_supp,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY date_supp) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, ms.date_supp
+                            FROM pregnancy p
+                            INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE ms.supplement_type = 'Iron Sulfate w/Folic Acid'
+                            AND ms.date_supp IS NOT NULL
+                            AND ms.date_supp != '0000-00-00'
+                            $barangayFilter
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$ironDoses} " . getDateCondition($period, 'date_supp', $year, $month, $quarter);
+            break;
 
         case 'calcium':
             $calciumDoses = intval($threshold ?? 3);
-            $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count
-                    FROM pregnancy p
-                    INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
-                    INNER JOIN patient pt ON p.patient_id = pt.patient_id
-                    INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
-                    WHERE p.date_terminated IS NOT NULL
-                    AND p.date_terminated != '0000-00-00'
-                    AND ms.supplement_type = 'Calcium Carbonate'
-                    AND ms.date_supp IS NOT NULL 
-                    AND ms.date_supp != '0000-00-00'
-                    " . getDateCondition($period, 'p.date_terminated', $year, $month, $quarter) . "
-                    $barangayFilter
-                    GROUP BY p.pregnancy_id, pt.age_bracket
-                    HAVING COUNT(ms.maternal_supplement_id) = {$calciumDoses}";
+            $sql = "SELECT age_bracket
+                    FROM (
+                        SELECT pregnancy_id, age_bracket, date_supp,
+                            ROW_NUMBER() OVER (PARTITION BY pregnancy_id ORDER BY date_supp) AS dose_num
+                        FROM (
+                            SELECT p.pregnancy_id, pt.age_bracket, ms.date_supp
+                            FROM pregnancy p
+                            INNER JOIN maternal_supplements ms ON p.pregnancy_id = ms.pregnancy_id
+                            INNER JOIN patient pt ON p.patient_id = pt.patient_id
+                            INNER JOIN health_center hc ON pt.health_center_id = hc.health_center_id
+                            WHERE ms.supplement_type = 'Calcium Carbonate'
+                            AND ms.date_supp IS NOT NULL
+                            AND ms.date_supp != '0000-00-00'
+                            $barangayFilter
+                        ) doses
+                    ) ranked
+                    WHERE dose_num = {$calciumDoses} " . getDateCondition($period, 'date_supp', $year, $month, $quarter);
+            break;
 
         case 'iodine':
             $sql = "SELECT pt.age_bracket, COUNT(DISTINCT p.pregnancy_id) as count

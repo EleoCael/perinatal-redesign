@@ -2,20 +2,23 @@ function selectInfantData(filterValue){
     console.log('Filter selected:', filterValue);
     
     // Store current filter
-    window.currentInfantFilter = filterValue;
+    window.currentFilter = filterValue;
+    fetchInfantData(1);
+
+    // Pagination logic is redirected to fetch_maternal_record.php
     
     // Load filtered records
-    if (filterValue === 'all') {
-        // Use the existing fetchData function for "All Records"
-        if (typeof fetchInfantData === 'function') {
-            fetchInfantData(1);
-        }
-    } else {
-        // Use filter function for specific filters
-        if (typeof loadFilteredInfantRecords === 'function') {
-            loadFilteredInfantRecords(filterValue);
-        }
-    }
+    // if (filterValue === 'all') {
+    //     Use the existing fetchData function for "All Records"
+    //     if (typeof fetchInfantData === 'function') {
+    //         fetchInfantData(1);
+    //     }
+    // } else {
+    //     Use filter function for specific filters
+    //     if (typeof loadFilteredInfantRecords === 'function') {
+    //         loadFilteredInfantRecords(filterValue);
+    //     }
+    // }
 }
 
 // Make this function globally available
@@ -35,7 +38,7 @@ window.loadFilteredInfantRecords = function(filterType) {
             tbody.html(response);
             
             // Hide pagination when filtering
-            $('#pagination-container').hide();
+            $('#infant-pagination').hide();
         },
         error: function(xhr, status, error) {
             console.error('AJAX Error:', error);
@@ -44,4 +47,3 @@ window.loadFilteredInfantRecords = function(filterType) {
         }
     });
 };
-

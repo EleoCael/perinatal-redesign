@@ -1,5 +1,6 @@
 //search record
 function initialPostpartumSearch(){
+  observePostpartumInput();
 
    $('form').submit(function(event) {
         event.preventDefault(); 
@@ -14,6 +15,28 @@ function initialPostpartumSearch(){
         fetchPostpartumData(pageNumber);
     }
   });
+}
+
+function observePostpartumInput() {
+    const input = document.getElementById('search_postpartum');
+
+    if (!input) return;
+
+    const observer = new ResizeObserver(entries => {
+        const width = entries[0].contentRect.width;
+
+        if (width < 180) {
+            input.placeholder = 'Search';
+        }
+        else if (width < 280) {
+            input.placeholder = 'Search Records';
+        }
+        else {
+            input.placeholder = 'Search Postpartum Records';
+        }
+    });
+
+    observer.observe(input);
 }
 
 function searchPostpartumRecord(){
@@ -48,10 +71,12 @@ function fetchPostpartumData(page = 1) {
     url: "patient/postpartum/fetch_postpartum_record.php",
     method: "POST",
     dataType: "json",
-    data: { action: "fetchData", page: page },
+    data: { 
+      action: "fetchData", 
+      page: page, 
+      filter_type: window.currentFilter || 'all' },
     success: function (response) {
       $("#postpartum_record_list").html(response.table_data);
-
       $("#pagination-container").html(response.pagination_links);
     },
     error: function (xhr, status, error) {
@@ -119,22 +144,8 @@ $(document).on("click", " .delete_postpartum_btn", function () {
 $(document).on("click", ".view_postpartum_btn", function () {
   let id = $(this).data("id");
   //this is for basic patient info
-  $.ajax({
-    url: "patient/postpartum/view_btn_postpartum.php",
-    method: "POST",
-    data: {patient_id : id}, 
-    success: function (result) {
-    
-      $("#postpartumModalContent").html(result);
-      $('#myPostpartumModal').modal('show');
-      
-    },
-    error: function(xhr, status, error) {
-            console.error("View AJAX Error:", status, error);
-          
-            $("#postpartumModalContent").html("<p class='text-danger'>Error loading record details.</p>");
-            $('#myPostpartumModal').modal('show');
-        }
-  });
+  loadPage(
+    'patient/postpartum/view_btn_postpartum.php?patient_id=' + id
+  );
 });
 //view button function

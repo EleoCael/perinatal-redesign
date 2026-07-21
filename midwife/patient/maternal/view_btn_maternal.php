@@ -27,8 +27,8 @@ function displayCheckbox($array, $key, $default = 'N/A')
     }
 }
 
-if (isset($_POST["patient_id"])) {
-    $patient_id = $_POST['patient_id'];
+if (isset($_GET["patient_id"])) {
+    $patient_id = $_GET['patient_id'];
     $health_center_id = $_SESSION['health_center_id'];
     $output = '';
 
@@ -54,8 +54,23 @@ if (isset($_POST["patient_id"])) {
         $email = insertValues($row, 'email');
         $contact = insertValues($row, 'contact_number');
 
-        $output .= " 
-                <div class = 'table-responsive'>
+        $output .= "
+        <div class='container-fluid'>
+            <div class='row'>
+                <div class='panel panel-default shadow-lg rounded'>
+                    <div class='panel-heading'>
+                        <div class='panel-body'>
+                            <div class='mt-3'>
+                                <a
+                                    href='#'
+                                    onclick='loadPage(`patient/maternal/view_maternal_patient.php`); return false;'
+                                    class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
+                                    style='cursor: pointer;'
+                                >
+                                    &lt; Back to Patients
+                                </a>
+                            </div>
+                            <div class = 'table-responsive'>
                     <table class = 'table table-bordered'>
                         <tr>
                             <td class = 'table-dark text-center' colspan = '2'><label><strong>BASIC INFORMATION</strong></label></td>  
@@ -132,7 +147,7 @@ if (isset($_POST["patient_id"])) {
             $format_date = date('Y-m-d', strtotime($pregnancy['date_created']));
             $output .= "
                 <tr>
-                    <td><strong>Pregnancy #</strong>{$pregnancy_count}( Date Created: {$format_date}) </td>
+                    <td><strong>Pregnancy #{$pregnancy_count}</strong> ( Date Created: {$format_date}) </td>
                     <td>
                         <button class = 'btn btn-sm btn-outline-primary view_preg_btn'
                                 data-preg-id ='{$pregnancy['pregnancy_id']}'
@@ -160,14 +175,17 @@ if (isset($_POST["patient_id"])) {
         ";
     }
     $output .= "</table>
-                    <div>
+                    <div class='mt-3'>
                         <button id='addPregnancyBtn' class='btn btn-primary' data-patient-id='{$patient_id}'>
                             <i class='bi bi-person-plus me-2' style='color:white;'></i> Add New Pregnancy
                         </button>
                          <button id='addInfantBtn' class='btn btn-danger' data-mother-id='{$patient_id}'>
                             <i class='bi bi-person-plus me-2' style='color:white;'></i> Add Infant Records
                         </button>
-                     </div>
-            </div>";
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>";
  echo $output;
 }

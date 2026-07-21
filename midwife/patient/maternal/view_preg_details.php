@@ -28,11 +28,22 @@ function displayCheckbox($array, $key, $default = 'N/A')
     }
 }
 
-if (isset($_POST['pregnancy_id'])) {
-    $pregnancy_id = $_POST['pregnancy_id'];
+if (isset($_GET['pregnancy_id'])) {
+    $pregnancy_id = $_GET['pregnancy_id'];
     $health_center_id = $_SESSION['health_center_id'];
     $output = '';
 
+    $id_query = "SELECT pt.patient_id FROM patient pt
+                INNER JOIN pregnancy p ON p.patient_id = pt.patient_id
+                WHERE p.pregnancy_id = ? AND pt.health_center_id = ?";
+
+    $stmt_id = $conn->prepare($id_query);
+    $stmt_id->bind_param("ii", $pregnancy_id, $health_center_id);
+    $stmt_id->execute();
+    
+    $id_result = $stmt_id->get_result();
+    $patient = $id_result->fetch_assoc();
+    $patient_id = insertValues($patient, 'patient_id');
     //pregnancy table
     $pregnancy_query = "SELECT p.* FROM pregnancy p 
                        INNER JOIN patient pt ON p.patient_id = pt.patient_id 
@@ -612,6 +623,21 @@ if (isset($_POST['pregnancy_id'])) {
     $remarks = insertValues($remarks_postpartum, 'remarks');
 
     $output .= "
+    <div class='container-fluid'>
+            <div class='row'>
+                <div class='panel panel-default shadow-lg rounded'>
+                    <div class='panel-heading'>
+                        <div class='panel-body'>
+                            <div class='mt-3'>
+                                <a
+                                    href='#'
+                                    onclick='loadPage(`patient/maternal/view_btn_maternal.php?patient_id=$patient_id`); return false;'
+                                    class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
+                                    style='cursor: pointer;'
+                                >
+                                    &lt; Back to General Information
+                                </a>
+                            </div>
              <div class = 'table-responsive'>
                     <table class = 'table table-bordered'>
                          <tr>
@@ -994,7 +1020,9 @@ if (isset($_POST['pregnancy_id'])) {
                                    
                     </table>
                </div>
-
+            </div>
+        </div>
+    </div>
             ";
 }
 

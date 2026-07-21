@@ -8,7 +8,13 @@
             <div class="d-flex align-items-center">
               <div class="form-group position-relative flex-grow-1 me-2">
                 <i class="fa fa-search search-icon"></i>
-                <input class="form-control-search" type="text" name="search_infant" id="search_infant" placeholder="Search Infant Record">
+                <input
+                  class="form-control-search" 
+                  type="text" 
+                  name="search_infant" 
+                  id="search_infant" 
+                  placeholder="Search Infant Record"
+                >
               </div>
               <div>
                   <select class="form-select" class="form-control"  onchange="selectInfantData(this.value); this.blur();">
@@ -60,7 +66,7 @@
         </table>
       </div>
 
-      <div id="pagination-container" class="mt-4"></div>
+      <div id="infant-pagination" class="mt-4"></div>
     </div>
   </div>
 

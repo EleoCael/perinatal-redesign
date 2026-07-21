@@ -97,6 +97,21 @@ const AdminUtils = {
 // Make functions globally available
 window.AdminUtils = AdminUtils;
 
+function initIndicatorSorting() {
+  const tbody = document.getElementById('indicatorRows');
+  if (!tbody || typeof Sortable === 'undefined') {
+    console.warn('indicatorRows or Sortable not available yet');
+    return;
+  }
+
+  new Sortable(tbody, {
+    handle: '.drag-handle',
+    animation: 150,
+    ghostClass: 'sortable-ghost'
+  });
+}
+window.initIndicatorSorting = initIndicatorSorting;
+
 // Main function to load content via AJAX and manage active links
 function loadPage(page, clickedElement) {
   console.log("loadPage called with:", page);
@@ -144,6 +159,18 @@ function loadPage(page, clickedElement) {
             window.initReportPage();
           } else {
             console.warn("⚠️ initReportPage function not found");
+          }
+        }, 100);
+      }
+
+      if (page === 'manage_indicators.php' || page.includes('manage_indicators.php')) {
+        console.log("🎯 Manage Indicators page detected, initializing...");
+        setTimeout(function() {
+          if (typeof window.initIndicatorSorting === 'function') {
+            console.log("✅ Calling initIndicatorSorting()");
+            window.initIndicatorSorting();
+          } else {
+            console.warn("⚠️ initIndicatorSorting function not found");
           }
         }, 100);
       }

@@ -7,7 +7,7 @@
                     <form method="POST"> 
                         <div class="d-flex align-items-center">
                             <div class="form-group position-relative flex-grow-1 me-2">
-                                <i class="fa fa-search search-icon"></i>
+                                <i class="fa fa-search search-icon ms-2"></i>
                                 <input class="form-control-search" type="text" name="search_maternal" id="search_maternal" placeholder="Search Maternal Records">
                             </div>
                             <div class="filter">
@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <table class="table table-hover mb-0" style="background-color: #fff;">
+            <table class="table table-hover mb-4" style="background-color: #fff;">
                 <caption><strong>List of Maternal Patients</strong></caption>
                 <thead class="table-dark">
                     <tr>
@@ -54,7 +54,7 @@
                 </tbody>
             </table>
 
-            <div id="pagination-container" class="mt-4"></div>
+            <div id="maternal-pagination" class="mb-4"></div>
 
         </div>
     </div>
