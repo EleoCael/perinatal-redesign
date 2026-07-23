@@ -161,6 +161,36 @@ if (isset($_SESSION['form_errors']) && !empty($_SESSION['form_errors'])) {
                                 </div>
                             </div>
 
+                            <!-- Pregnancy Metrics (Maternal only) -->
+                            <div class="mb-3 mt-2" id="pregnancy_metrics_group" style="display:none;">
+                                <label class="form-label d-block">Pregnancy Metrics</label>
+                                <div class="row g-3">
+                                    <div class="col">
+                                        <label class="form-label">Last Menstrual Period (LMP)</label>
+                                        <input type="date" class="form-control" name="lmp"
+                                         max="<?php echo date('Y-m-d'); ?>" id="lmp">
+                                        <span id="error_lmp" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Estimated Date of Confinement (EDC)</label>
+                                        <input type="date" class="form-control" name="edc" id="edc">
+                                        <span id="error_edc" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mt-1">
+                                    <div class="col">
+                                        <label class="form-label">Gravidity</label>
+                                        <input type="number" name="gravidity" min="0" class="form-control" id="gravidity">
+                                        <span id="error_gravidity" class="text-danger"></span>
+                                    </div>
+                                    <div class="col">
+                                        <label class="form-label">Parity</label>
+                                        <input type="number" name="parity" min="0" class="form-control" id="parity">
+                                        <span id="error_parity" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Email + Contact Number -->
                             <div class="row mt-4">
                                 <div class="col mb-3">

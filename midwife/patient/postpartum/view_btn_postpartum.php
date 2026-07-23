@@ -194,133 +194,138 @@ foreach ($postpartum_supp as $post_iron_supp) {
             <div class='panel-heading'>
                 <div class='panel-body'>
                     <div class='mt-3'>
-                        <a
-                            href='#'
+                        <button
+                            type='button'
                             onclick='loadPage(`patient/postpartum/view_postpartum_record.php`); return false;'
-                            class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
-                            style='cursor: pointer;'
+                            class='btn btn-outline-secondary btn-sm'
                         >
-                            &lt; Back to Patients
-                        </a>
+                            Back to Patients
+                        </button>
                    </div>
-                <div class = 'table-responsive'>
-                    <table class = 'table table-bordered'>
-                        <tr>
-                            <td class = 'table-dark text-center' colspan = '2'><label><strong>BASIC INFORMATION</strong></label></td>  
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>No.</strong></label></td>
-                            <td width = '60%'>{$row['patient_id']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Date of Registration(yyyy-mm-dd)</strong></label></td>
-                            <td width = '60%'>{$row['date_of_registration']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Family Serial No.</strong></label></td>
-                            <td width = '60%'>{$family_serial_no}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Full Name</strong></label></td>
-                            <td width = '60%'>{$full_name}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Address</strong></label></td>
-                            <td width = '60%'>{$row['address']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Socio Economic Status</strong></label></td>
-                            <td width = '60%'>{$row['socio_economic_status']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Date of Birth(yyyy-mm-dd)</strong></label></td>
-                            <td width = '60%'>{$row['birth_date']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Age Bracket</strong></label></td>
-                            <td width = '60%'>{$row['age_bracket']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Age</strong></label></td>
-                            <td width = '60%'>{$row['age']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Email</strong></label></td>
-                            <td width = '60%'>{$email}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Contact No.</strong></label></td>
-                            <td width = '60%'>{$contact}</td>
-                         </tr> 
-                         <tr class = 'mt-3'>
-                            <td class = 'table-dark text-center' colspan = '2'><label><strong>POSTPARTUM CARE</strong></label></td>  
-                         </tr>
-                          <tr>
-                            <td width = '40%'><label><strong>Postpartum Check-Ups</strong></label></td>
-                            <td width = '60%' id = 'post-checkup-info-{$patient_id}'>
-                                {$post_checkup_html}
-                                <button type='button' class='btn btn-outline-primary w-100  add_postpartum_checkup_btn mt-2'
-                                    data-patient-id='{$patient_id}'
-                                    data-bs-toggle='modal'
-                                    data-bs-target='#addPostCheckupModal'>
-                                    <i class='bi bi-plus-lg text-white'></i> Add Check-up
-                                </button>
-                            </td>  
-                        </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Date and Time of Delivery</strong></label></td>
-                            <td width = '60%'>
-                                <p><strong>Date(yyyy-mm-dd)</strong>: <span id='post_delivery_date_<?php echo $patient_id;?>'>{$post_delivery_date}</span></p>
-                                <p><strong>Time</strong>: <span id='post_delivery_time_<?php echo $patient_id;?>'>{$post_delivery_time}</span></p>
-                            </td>  
-                        </tr>                      
-                        <tr>
-                            <td width = '40%'><label><strong>Date and Time Initiated Breastfeeding</strong></label></td>
-                            <td width = '60%'>
-                                <p><strong>Date Breastfed(yyyy-mm-dd)</strong>: <span id='breastfeeding_date_<?php echo $patient_id;?>'>{$breastfeeding_date}</span></p>
-                                <p><strong>Time Breastfed</strong>: <span id='breastfeeding_time_<?php echo $patient_id;?>'>{$breastfeeding_time}</span></p>
-                            </td>  
-                        </tr>
-                        <tr>
-                            <td colspan = '2'>        
-                                <button class='btn btn-outline-primary w-100 add_postpartum_details_btn mt-2'
+                    <div class='card shadow-sm rounded mb-3'>
+                        <div class='card-header bg-dark text-white text-center'>
+                            <strong>BASIC INFORMATION</strong>
+                        </div>
+                        <div class='card-body'>
+                            <div class='row row-cols-1 row-cols-md-2 g-3'>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>No.</div>
+                                    <div class='fw-semibold'>{$row['patient_id']}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Full Name</div>
+                                    <div class='fw-semibold'>{$full_name}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Family Serial No.</div>
+                                    <div class='fw-semibold'>{$family_serial_no}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Date of Registration <span class='fw-normal'>(yyyy-mm-dd)</span></div>
+                                    <div class='fw-semibold'>{$row['date_of_registration']}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Date of Birth <span class='fw-normal'>(yyyy-mm-dd)</span></div>
+                                    <div class='fw-semibold'>{$row['birth_date']}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Age / Age Bracket</div>
+                                    <div class='fw-semibold'>{$row['age']} &nbsp;<span class='text-muted'>({$row['age_bracket']})</span></div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Socio Economic Status</div>
+                                    <div class='fw-semibold'>{$row['socio_economic_status']}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Address</div>
+                                    <div class='fw-semibold'>{$row['address']}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Email</div>
+                                    <div class='fw-semibold'>{$email}</div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Contact No.</div>
+                                    <div class='fw-semibold'>{$contact}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class='card shadow-sm rounded mb-3'>
+                        <div class='card-header bg-dark text-white text-center'>
+                            <strong>POSTPARTUM CARE</strong>
+                        </div>
+                        <div class='card-body'>
+                            <div class='mb-3'>
+                                <div class='text-muted small mb-1'>Postpartum Check-Ups</div>
+                                <div id='post-checkup-info-{$patient_id}'>
+                                    {$post_checkup_html}
+                                    <button type='button' class='btn btn-outline-primary w-100 add_postpartum_checkup_btn mt-2'
+                                        data-patient-id='{$patient_id}'
+                                        data-bs-toggle='modal'
+                                        data-bs-target='#addPostCheckupModal'>
+                                        <i class='bi bi-plus-lg text-white'></i> Add Check-up
+                                    </button>
+                                </div>
+                            </div>
+                            <div class='row row-cols-1 row-cols-md-2 g-3 mb-3'>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Date and Time of Delivery</div>
+                                    <div class='fw-semibold'>
+                                        <div>Date (yyyy-mm-dd): <span id='post_delivery_date_<?php echo $patient_id;?>'>{$post_delivery_date}</span></div>
+                                        <div>Time: <span id='post_delivery_time_<?php echo $patient_id;?>'>{$post_delivery_time}</span></div>
+                                    </div>
+                                </div>
+                                <div class='col'>
+                                    <div class='text-muted small mb-1'>Date and Time Initiated Breastfeeding</div>
+                                    <div class='fw-semibold'>
+                                        <div>Date Breastfed (yyyy-mm-dd): <span id='breastfeeding_date_<?php echo $patient_id;?>'>{$breastfeeding_date}</span></div>
+                                        <div>Time Breastfed: <span id='breastfeeding_time_<?php echo $patient_id;?>'>{$breastfeeding_time}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class='btn btn-outline-primary w-100 add_postpartum_details_btn'
                                 data-preg-id = '{$patient_id}'
                                 data-bs-toggle = 'modal'
                                 data-bs-target = '#addPostpartumDetailsModal'>
                                 <i class='bi bi-plus-lg text-white'></i>Update Postpartum Details</button>
-                            </td> 
-                        </tr>
-                        <tr>
-                            <td class = 'table-dark text-center' colspan = '2'><label><strong>MICRONUTRIENT SUPPLEMENTATION(postpartum)</strong></label></td>  
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Iron w/Folic Acid</strong></label></td>
-                            <td width = '60%' id = 'post-iron-info-{$patient_id}'>
-                                {$post_iron_html}
-                                <button class='btn btn-outline-primary w-100 add_postpartum_iron_btn'
-                                        data-preg-id = '{$patient_id}'
-                                        data-bs-toggle = 'modal'
-                                        data-bs-target = '#addPostpartumIronModal'>
-                                     <i class='bi bi-plus-lg text-white'></i>Update Iron Supplement
-                                     </button>
-                            </td>  
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Vitamin A</strong></label></td>
-                            <td width = '60%' id = 'vitamin-info-{$patient_id}'>
-                                <div>{$vitamin_a_display}</div>
-                                <div>{$vitamin_date_display}</div>  
-                                     <button type='button' class='btn btn-outline-primary w-100 add_post_vitamin_btn mt-2'
+                        </div>
+                    </div>
+
+                    <div class='card shadow-sm rounded mb-3'>
+                        <div class='card-header bg-dark text-white text-center'>
+                            <strong>MICRONUTRIENT SUPPLEMENTATION (postpartum)</strong>
+                        </div>
+                        <div class='card-body'>
+                            <div class='mb-3'>
+                                <div class='text-muted small mb-1'>Iron w/Folic Acid</div>
+                                <div id='post-iron-info-{$patient_id}'>
+                                    {$post_iron_html}
+                                    <button class='btn btn-outline-primary w-100 add_postpartum_iron_btn mt-2'
+                                            data-preg-id = '{$patient_id}'
+                                            data-bs-toggle = 'modal'
+                                            data-bs-target = '#addPostpartumIronModal'>
+                                         <i class='bi bi-plus-lg text-white'></i>Update Iron Supplement
+                                         </button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class='text-muted small mb-1'>Vitamin A</div>
+                                <div id='vitamin-info-{$patient_id}'>
+                                    <div>{$vitamin_a_display}</div>
+                                    <div>{$vitamin_date_display}</div>
+                                    <button type='button' class='btn btn-outline-primary w-100 add_post_vitamin_btn mt-2'
                                         data-patient-id='{$patient_id}'
                                         data-vitamin-status = '{$vitamin_status}'
                                         data-bs-toggle='modal'
                                         data-bs-target='#addPostVitaminModal'>
                                         <i class='bi bi-plus-lg text-white'></i> {$button_text}
-                                    </button>                             
-                            </td>  
-                        </tr>              
-                    </table>
-               </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                </div>
                </div>
                </div>

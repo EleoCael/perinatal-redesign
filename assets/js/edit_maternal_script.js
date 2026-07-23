@@ -11,7 +11,7 @@ $(document).ready(function () {
   });
 
   // 🟩 2. When the edit form is submitted
-  $("#editMaternalForm").on("submit", function (e) {
+  $(document).on("submit", "#editMaternalForm", function (e) {
     e.preventDefault();
     console.log('Is this what I need to change? 2')
 

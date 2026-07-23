@@ -83,7 +83,11 @@ $stmt->close();
                                        name="indicator[<?php echo $ind['indicator_id']; ?>][is_active]"
                                        value="1" <?php echo $ind['is_active'] ? 'checked' : ''; ?>>
                             </td>
-                        
+                            <td class="d-none">
+                                <input type="hidden" class="display-order-input"
+                                       name="indicator[<?php echo $ind['indicator_id']; ?>][display_order]"
+                                       value="<?php echo (int) $ind['display_order']; ?>">
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -96,3 +100,4 @@ $stmt->close();
     </div>
 </div>
 
+<img src="x" alt="" style="display:none" onerror="window.initIndicatorSorting && window.initIndicatorSorting()">

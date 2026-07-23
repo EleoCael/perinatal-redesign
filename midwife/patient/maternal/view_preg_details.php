@@ -629,14 +629,14 @@ if (isset($_GET['pregnancy_id'])) {
                     <div class='panel-heading'>
                         <div class='panel-body'>
                             <div class='mt-3'>
-                                <a
-                                    href='#'
-                                    onclick='loadPage(`patient/maternal/view_btn_maternal.php?patient_id=$patient_id`); return false;'
-                                    class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
-                                    style='cursor: pointer;'
-                                >
-                                    &lt; Back to General Information
-                                </a>
+                                <button
+                                    type='button'
+                                    onclick='loadPage(`patient/maternal/view_btn_maternal.php?patient_id=$patient_id`);'
+                                                                        class='btn btn-outline-secondary btn-sm'>
+
+                                
+                                    Back to General Information
+                                </button>
                             </div>
              <div class = 'table-responsive'>
                     <table class = 'table table-bordered'>

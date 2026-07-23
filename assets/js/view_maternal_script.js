@@ -86,17 +86,6 @@ $(document).ready(function () {
 });
 //display records in table
 
-// Dropdown work-around because earlier methods couldn't get the menu to open :)
-$(document).on('click', '[data-bs-toggle="dropdown"]', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    bootstrap.Dropdown
-        .getOrCreateInstance(this)
-        .toggle();
-});
-// Dropdown work-around because earlier methods couldn't get the menu to open :)
-
 //pagination
 $(document).on("click", "#maternal-pagination .page-link", function (e) {
   e.preventDefault();
@@ -153,6 +142,15 @@ $(document).on("click", ".view_btn", function () {
   );
 });
 //view button function
+
+//edit button function
+$(document).on("click", ".edit_btn", function () {
+  let id = $(this).data("id");
+  loadPage(
+    'patient/maternal/edit_maternal.php?patient_id=' + id
+  );
+});
+//edit button function
 
 //view button function for pregnancy details
 $(document).on("click", ".view_preg_btn", function () {

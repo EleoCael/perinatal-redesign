@@ -13,6 +13,14 @@ if (isset($_SESSION['form_errors']) && !empty($_SESSION['form_errors'])) {
 $patient_id = isset($_GET['patient_id']) ? intval($_GET['patient_id']) : 0;
 $patient_display_name = '';
 
+// Carried forward from the basic info step (redo-addPatient_info.php), where
+// these are collected for maternal patients. Re-submitted as hidden inputs
+// below so maternal_medical_process.php still receives them in $_POST as before.
+$carried_lmp       = isset($_GET['lmp']) ? $_GET['lmp'] : '';
+$carried_edc       = isset($_GET['edc']) ? $_GET['edc'] : '';
+$carried_gravidity = isset($_GET['gravidity']) && is_numeric($_GET['gravidity']) ? $_GET['gravidity'] : '';
+$carried_parity    = isset($_GET['parity']) && is_numeric($_GET['parity']) ? $_GET['parity'] : '';
+
 if ($patient_id > 0) {
     $stmt_name = $conn->prepare("SELECT first_name, middle_name, last_name FROM patient WHERE patient_id = ? LIMIT 1");
     $stmt_name->bind_param("i", $patient_id);
@@ -39,6 +47,22 @@ if ($patient_id > 0) {
 
     <form id="maternalMedicalForm" action="/rhusystem/midwife/patient/maternal/maternal_medical_process.php" method="POST">
         <input type="hidden" name="patient_id" value="<?php echo htmlspecialchars($patient_id); ?>">
+        <input type="hidden" name="lmp" value="<?php echo htmlspecialchars($carried_lmp); ?>">
+        <input type="hidden" name="edc" value="<?php echo htmlspecialchars($carried_edc); ?>">
+        <input type="hidden" name="gravidity" value="<?php echo htmlspecialchars($carried_gravidity); ?>">
+        <input type="hidden" name="parity" value="<?php echo htmlspecialchars($carried_parity); ?>">
+
+        <?php if ($carried_lmp || $carried_edc || $carried_gravidity !== '' || $carried_parity !== ''): ?>
+        <div class="alert alert-secondary py-2 px-3 mb-3">
+            <small>
+                <strong>From Basic Info:</strong>
+                LMP: <?php echo htmlspecialchars($carried_lmp ?: 'N/A'); ?> &nbsp;|&nbsp;
+                EDC: <?php echo htmlspecialchars($carried_edc ?: 'N/A'); ?> &nbsp;|&nbsp;
+                Gravidity: <?php echo htmlspecialchars($carried_gravidity !== '' ? $carried_gravidity : 'N/A'); ?> &nbsp;|&nbsp;
+                Parity: <?php echo htmlspecialchars($carried_parity !== '' ? $carried_parity : 'N/A'); ?>
+            </small>
+        </div>
+        <?php endif; ?>
 
         <ul class="nav nav-tabs" id="myTabs">
             <li class="nav-item">
@@ -56,41 +80,6 @@ if ($patient_id > 0) {
 
             <!--Pregnancy & Delivery-->
             <div class="tab-pane fade show active" id="pregnancy-delivery-tab">
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-header text-center">
-                        PREGNANCY METRICS
-                    </div>
-                    <div class="card-body ">
-                        <div class="form-group group-form">
-                            <div class="row mt-2">
-                                <div class="col ">
-                                    <label class="form-label">Last Menstrual Period (LMP)</label>
-                                    <input type="date" class="form-control" name="lmp"
-                                     max="<?php echo date('Y-m-d'); ?>" id="lmp">
-                                     <span id="error_lmp" class="text-danger"></span>
-                                </div>
-                                <div class="col">
-                                    <label class="form-label">Estimated Date of Confinement(EDC) </label>
-                                    <input type="date" class="form-control" name="edc">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col">
-                                    <label class="form-label">Gravidity</label>
-                                    <input type="number" name="gravidity" min="0" class="form-control">
-                                    <span id="error_gravidity" class="text-danger"></span>
-                                </div>
-                                <div class="col">
-                                    <label class="form-label">Parity</label>
-                                    <input type="number" name="parity" min="0" class="form-control">
-                                    <span id="error_parity" class="text-danger"></span>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="card mb-3 shadow-sm">
                     <div class="card-header text-center">
                         PREGNANCY OUTCOME

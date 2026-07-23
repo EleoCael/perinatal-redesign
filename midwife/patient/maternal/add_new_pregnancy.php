@@ -231,7 +231,7 @@
 
                 <div class="d-flex justify-content-end gap-2 mb-3 ">
                     <button class="btn btn-secondary js-back_button col-md-2" type="button" onclick="
-                                loadPage('addPatient_LandingPg.php');">Back</button>
+                                loadPage('patient/maternal/view_maternal_patient.php');">Back</button>
                     <button class="btn btn-primary js-next_button col-md-2" name="next_btn" type="button" >Next</button>
                 </div>
             </div>
@@ -703,6 +703,3 @@
         </div>
     </form>
 </div>
-
-
-

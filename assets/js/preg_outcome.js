@@ -19,13 +19,10 @@ function refreshPregOutcomeInfo(pregId) {
   });
 }
 
-let pendingPregId = null;
 $(document).on("click", ".add_preg_outcome_btn", function () {
   let pregId = $(this).data("preg-id");
   $("#outcome_pregnancy_id").val(pregId);
 
-  $("#viewPregnancyRecord").modal("hide");
-  //$('#myModal').modal('hide');
   $("#addPregOutcomeModal").modal("show");
 });
 
@@ -40,17 +37,18 @@ $("#addPregOutcomeForm").on("submit", function (e) {
     data: formData,
     success: function (response) {
       if (response.trim() === "success") {
-         pendingPregId = pregId;  
-        $("#addPregOutcomeModal").modal("hide");
         $("#addPregOutcomeForm")[0].reset();
 
-        Swal.fire({
-          title: "Success!",
-          text: "Pregnancy Outcome Added successfully.",
-          icon: "success",
-          showConfirmButton: true
+        $("#addPregOutcomeModal").one("hidden.bs.modal", function () {
+          Swal.fire({
+            title: "Success!",
+            text: "Pregnancy Outcome Added successfully.",
+            icon: "success",
+            showConfirmButton: true
+          });
+          refreshPregOutcomeInfo(pregId);
         });
-        refreshPregOutcomeInfo(pregId);
+        $("#addPregOutcomeModal").modal("hide");
       } else {
         Swal.fire(
           "Error 🚨",
@@ -69,20 +67,4 @@ $("#addPregOutcomeForm").on("submit", function (e) {
       );
     },
   });
-});
-
-$("#addPregOutcomeModal").on("hidden.bs.modal", function () {
-  setTimeout(() => {
-    $("#viewPregnancyRecord").modal("show");
-    $("#myModal").modal("show");
-  }, 200);
-});
-
-$("#viewPregnancyRecord").on("shown.bs.modal", function () {
-  if (pendingPregId) {
-    setTimeout(function () {
-      refreshPregOutcomeInfo(pendingPregId);
-      pendingPregId = null;
-    }, 300);
-  }
 });

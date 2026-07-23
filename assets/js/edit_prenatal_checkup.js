@@ -1,30 +1,3 @@
-
-document.addEventListener('click', function(e) {
-   
-    if (e.target.closest('.edit_checkup_btn')) {
-        const editBtn = e.target.closest('.edit_checkup_btn');
-        openEditCheckupModal(editBtn);
-    }
-});
-
-function openEditCheckupModal(editBtn) {
-   
-    const checkupId = editBtn.getAttribute('data-checkup-id');
-    const pregnancyId = editBtn.getAttribute('data-preg-id');
-    const trimester = editBtn.getAttribute('data-trimester');
-    const checkupDate = editBtn.getAttribute('data-checkup-date');
-    
-  
-    document.getElementById('edit_checkup_id').value = checkupId;
-    document.getElementById('edit_pregnancy_id').value = pregnancyId;
-    document.getElementById('edit_trimester').value = trimester;
-    document.getElementById('edit_checkup_date').value = checkupDate;
-    
-    
-    const editModal = new bootstrap.Modal(document.getElementById('editCheckupModal'));
-    editModal.show();
-}
-
 //submission
 document.getElementById('saveEditCheckupBtn').addEventListener('click', function() {
     saveCheckupChanges();
@@ -62,7 +35,7 @@ function initializeEditButtons() {
         document.getElementById('edit_trimester').value = trimester;
         document.getElementById('edit_checkup_date').value = checkupDate;
         
-        const editModal = new bootstrap.Modal(document.getElementById('editCheckupModal'));
+        const editModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('editCheckupModal'));
         editModal.show();
     });
 }

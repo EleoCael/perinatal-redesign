@@ -9,10 +9,12 @@ $(document).ready(function () {
     );
   });
 
-  $("#editInfantForm").on("submit", function (e) {
+  $(document).on("submit", "#editInfantForm", function (e) {
     e.preventDefault();
 
     const formData = $(this).serialize();
+    const $submitBtn = $(this).find('button[type="submit"]');
+    $submitBtn.prop("disabled", true);
 
     $.ajax({
       url: "patient/infant/edit_btn_infant.php",
@@ -27,12 +29,11 @@ $(document).ready(function () {
             text: response.message,
             showConfirmButton: false,
             timer: 1500
+          }).then(function () {
+            loadPage('patient/infant/view_infant_patient.php');
           });
-
-          $("#editInfantModal").modal("hide");
-
-          refreshInfantTable();
         } else {
+          $submitBtn.prop("disabled", false);
           Swal.fire({
             icon: "error",
             title: "Update Failed",
@@ -41,6 +42,7 @@ $(document).ready(function () {
         }
       },
       error: function (xhr, status, error) {
+        $submitBtn.prop("disabled", false);
         console.error("AJAX Error:", error);
          console.log('Response:', xhr.responseText); 
         Swal.fire({
@@ -51,16 +53,5 @@ $(document).ready(function () {
       }
     });
   });
-
-
-  function refreshInfantTable() {
-    $.ajax({
-      url: "patient/infant/fetch_infant_record.php",
-      type: "GET",
-      success: function (data) {
-        $("#infant_record_list").html(data); 
-      }
-    });
-  }
 
 });

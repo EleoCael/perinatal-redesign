@@ -1,8 +1,8 @@
 <?php
 require_once "../../../module/db.config.php";
-echo "Current file: " . __FILE__ . "<br>";
-echo "Directory: " . __DIR__ . "<br>";
-echo "Document root: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
+// echo "Current file: " . __FILE__ . "<br>";
+// echo "Directory: " . __DIR__ . "<br>";
+// echo "Document root: " . $_SERVER['DOCUMENT_ROOT'] . "<br>";
 
 $mother_id = isset($_GET['mother_id']) ? intval($_GET['mother_id']) : 0;
 
@@ -146,7 +146,7 @@ if ($mother) {
                             </div>
 
                             <div class="d-flex justify-content-end gap-2 mb-3">
-                                <button class="btn btn-secondary col-md-2" id="back_btn" type="button" onclick="loadPage('addPatient_LandingPg.php');">Back</button>
+                                <button class="btn btn-secondary col-md-2" id="back_btn" type="button" onclick="loadPage('patient/maternal/view_maternal_patient.php');">Back</button>
                                 <button class="btn btn-primary js-next_button col-md-2" name="next_btn" type="button">Next</button>
                             </div>
                         </div>

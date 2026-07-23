@@ -52,54 +52,98 @@ $(document).ready(function() {
     console.log('🚀 DIRECT jQuery Age Calculator Starting...');
     
 
-    $(document).on('change input blur', 'input[name="birth_date"]', function() {
-        console.log('🎯 BIRTH DATE CHANGED!');
+    // $(document).on('change input blur', 'input[name="birth_date"]', function() {
+    //     console.log('🎯 BIRTH DATE CHANGED!');
         
-        const birthDateValue = $(this).val();
-        console.log('Date value:', birthDateValue);
+    //     const birthDateValue = $(this).val();
+    //     console.log('Date value:', birthDateValue);
         
-        if (birthDateValue) {
+    //     if (birthDateValue) {
            
-            const today = new Date();
-            const birthDate = new Date(birthDateValue);
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
+    //         const today = new Date();
+    //         const birthDate = new Date(birthDateValue);
+    //         let age = today.getFullYear() - birthDate.getFullYear();
+    //         const m = today.getMonth() - birthDate.getMonth();
             
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
-            }
+    //         if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    //             age--;
+    //         }
             
-            console.log('Calculated age:', age);
+    //         console.log('Calculated age:', age);
             
            
-            $('input[name="age"], #age').val(age);
-            console.log('✓ Age set to:', age);
+    //         $('input[name="age"], #age').val(age);
+    //         console.log('✓ Age set to:', age);
             
             
-            let bracket = '';
-            if (age >= 10 && age <= 14) bracket = '10-14';
-            else if (age >= 15 && age <= 19) bracket = '15-19';
-            else if (age >= 20 && age <= 49) bracket = '20-49';
+    //         let bracket = '';
+    //         if (age >= 10 && age <= 14) bracket = '10-14';
+    //         else if (age >= 15 && age <= 19) bracket = '15-19';
+    //         else if (age >= 20 && age <= 49) bracket = '20-49';
             
-            console.log('Age bracket:', bracket);
+    //         console.log('Age bracket:', bracket);
             
             
-            $('input[name="age_bracket"]').prop('checked', false);
+    //         $('input[name="age_bracket"]').prop('checked', false);
             
-            if (bracket) {
-                $('input[name="age_bracket"][value="' + bracket + '"]').prop('checked', true);
-                console.log('✓ Age bracket checked:', bracket);
-                $('#error_age').text('');
-            } else {
-                $('#error_age').text('Age is outside valid maternal care brackets (10-49 years old)');
-                console.log('✗ Age outside valid range');
-            }
+    //         if (bracket) {
+    //             $('input[name="age_bracket"][value="' + bracket + '"]').prop('checked', true);
+    //             console.log('✓ Age bracket checked:', bracket);
+    //             $('#error_age').text('');
+    //         } else {
+    //             $('#error_age').text('Age is outside valid maternal care brackets (10-49 years old)');
+    //             console.log('✗ Age outside valid range');
+    //         }
             
-            console.log('=== DONE ===\n');
-        }
-    });
+    //         console.log('=== DONE ===\n');
+    //     }
+    // });
     
+    function calculateAgeFromBirthDate(birthDateValue) {
+        if (!birthDateValue) return;
+
+        const today = new Date();
+        const birthDate = new Date(birthDateValue);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        $('input[name="age"], #age').val(age);
+
+        let bracket = '';
+        if (age >= 10 && age <= 14) bracket = '10-14';
+        else if (age >= 15 && age <= 19) bracket = '15-19';
+        else if (age >= 20 && age <= 49) bracket = '20-49';
+
+        $('input[name="age_bracket"]').prop('checked', false);
+
+        if (bracket) {
+            $('input[name="age_bracket"][value="' + bracket + '"]').prop('checked', true);
+            $('#error_age').text('');
+        } else {
+            $('#error_age').text('Age is outside valid maternal care brackets (10-49 years old)');
+        }
+
+        // Lock the age bracket radios so they can't be manually clicked —
+        // they stay enabled (not `disabled`) so the value still submits with the form.
+        $('input[name="age_bracket"]')
+            .addClass('age-bracket-locked')
+            .attr('tabindex', '-1');
+    }
+
+    $(document).on('change input blur', 'input[name="birth_date"]', function() {
+        calculateAgeFromBirthDate($(this).val());
+    });
+
+    // Block clicks on locked age bracket radios (mouse and keyboard)
+    $(document).on('click', 'input[name="age_bracket"].age-bracket-locked', function(e) {
+        e.preventDefault();
+    });
   
+
     $(document).on('input', 'input[name="age"], #age', function() {
         const age = parseInt($(this).val());
         
@@ -127,22 +171,29 @@ $(document).ready(function() {
 (function() {
     console.log('🔄 Installing backup observer...');
     
+    let lastCheckedBirthInput = null;
+
     function attachDirectly() {
         const birthInput = document.querySelector('input[name="birth_date"]');
         if (!birthInput) return;
         
-        console.log('Observer: Found birth date input, attaching...');
-        
- 
         birthInput.onchange = function() {
-            console.log('💥 DIRECT onchange fired!');
             $(this).trigger('change');
         };
         
         birthInput.oninput = function() {
-            console.log('💥 DIRECT oninput fired!');
             $(this).trigger('input');
         };
+
+        // If this is a newly-found birth_date input (e.g. the Edit page just
+        // loaded) and it already has a value from the database, run the
+        // calculation immediately instead of waiting for the user to touch it.
+        if (birthInput !== lastCheckedBirthInput) {
+            lastCheckedBirthInput = birthInput;
+            if (birthInput.value) {
+                calculateAgeFromBirthDate(birthInput.value);
+            }
+        }
     }
     
     

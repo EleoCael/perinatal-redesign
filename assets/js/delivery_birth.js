@@ -20,16 +20,10 @@ function refreshBirthInfo(pregId) {
   });
 }
 
-let pendingBirthPregId = null;
 $(document).on("click", ".add_birth_info_btn", function () {
   let pregId = $(this).data("preg-id");
   $("#delivery_pregnancy_id").val(pregId);
-
-  $("#viewPregnancyRecord").modal("hide");
-  //$('#myModal').modal('hide');
-  setTimeout(() => {
-    $("#addBirthInfoModal").modal("show");
-  }, 300);
+  $("#addBirthInfoModal").modal("show");
 });
 
 $("#addBirthInfoForm").on("submit", function (e) {
@@ -43,17 +37,18 @@ $("#addBirthInfoForm").on("submit", function (e) {
     data: formData,
     success: function (response) {
       if (response.trim() === "success") {
-         pendingBirthPregId = pregId;  
-        $("#addBirthInfoModal").modal("hide");
         $("#addBirthInfoForm")[0].reset();
 
-        Swal.fire({
-          title: "Success!",
-          text: "Birth Information Added successfully.",
-          icon: "success",
-          showConfirmButton: true
+        $("#addBirthInfoModal").one("hidden.bs.modal", function () {
+          Swal.fire({
+            title: "Success!",
+            text: "Birth Information Added successfully.",
+            icon: "success",
+            showConfirmButton: true
+          });
+          refreshBirthInfo(pregId);
         });
-        refreshBirthInfo(pregId);
+        $("#addBirthInfoModal").modal("hide");
       } else {
         Swal.fire(
           "Error 🚨",
@@ -72,20 +67,4 @@ $("#addBirthInfoForm").on("submit", function (e) {
       );
     },
   });
-});
-
-$("#addBirthInfoModal").on("hidden.bs.modal", function () {
-  setTimeout(() => {
-    $("#viewPregnancyRecord").modal("show");
-    $("#myModal").modal("show");
-  }, 200);
-});
-
-$("#viewPregnancyRecord").on("shown.bs.modal", function () {
-  if (pendingBirthPregId) {
-    setTimeout(function () {
-      refreshBirthInfo(pendingBirthPregId);
-      pendingBirthPregId = null;
-    }, 300);
-  }
 });

@@ -525,6 +525,65 @@ document.addEventListener("submit", function (e) {
     });
 });
 
+// ─── Indicator drag-to-reorder (Manage Indicators page) ───
+// Called from manage_indicators.php after it's injected into the DOM.
+// NOTE: this file loads once on initial page load, so Sortable.js and this
+// function are available even though manage_indicators.php itself is
+// injected via AJAX (where <script> tags don't execute).
+function initIndicatorSorting() {
+    var tbody = document.getElementById("indicatorRows");
+    if (!tbody) return;
+
+    // tbody is a fresh element every time the fragment reloads, so this
+    // guard only prevents double-binding within the same load.
+    if (tbody.dataset.sortableInit === "1") return;
+    tbody.dataset.sortableInit = "1";
+
+    function renumberRows() {
+        var rows = tbody.querySelectorAll("tr[data-indicator-id]");
+        rows.forEach(function (row, index) {
+            var orderInput = row.querySelector(".display-order-input");
+            if (orderInput) {
+                orderInput.value = index + 1;
+            }
+        });
+    }
+
+    function attachSortable() {
+        new Sortable(tbody, {
+            handle: ".drag-handle",
+            animation: 150,
+            onEnd: renumberRows
+        });
+
+        var form = document.getElementById("manageIndicatorsForm");
+        if (form && !form.dataset.renumberBound) {
+            form.dataset.renumberBound = "1";
+            form.addEventListener("submit", renumberRows);
+        }
+
+        renumberRows();
+        console.log("✓ Indicator drag-to-reorder initialized");
+    }
+
+    if (typeof Sortable !== "undefined") {
+        attachSortable();
+    } else {
+        var existingScript = document.querySelector("script[data-sortablejs]");
+        if (!existingScript) {
+            var script = document.createElement("script");
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js";
+            script.setAttribute("data-sortablejs", "1");
+            script.onload = attachSortable;
+            document.head.appendChild(script);
+        } else {
+            existingScript.addEventListener("load", attachSortable);
+        }
+    }
+}
+
+window.initIndicatorSorting = initIndicatorSorting;
+
 // Log when script loads
 console.log("✓ report_admin.js loaded successfully");
 

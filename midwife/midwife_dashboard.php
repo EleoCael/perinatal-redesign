@@ -18,9 +18,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
     <title>Midwife Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/home.css">
     <link rel="stylesheet" href="../assets/css/midwife_dashboard.css">
@@ -128,7 +126,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -182,7 +180,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -233,7 +231,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -267,7 +265,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -307,7 +305,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -338,7 +336,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -381,7 +379,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -421,7 +419,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -456,7 +454,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -494,7 +492,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -543,7 +541,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -599,7 +597,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -637,7 +635,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -676,7 +674,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -720,7 +718,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -758,7 +756,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -799,7 +797,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -836,7 +834,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -883,7 +881,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -934,7 +932,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1152,7 +1150,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1178,7 +1176,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1216,7 +1214,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1242,7 +1240,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1281,7 +1279,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1312,7 +1310,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1348,7 +1346,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1383,7 +1381,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1417,7 +1415,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1453,7 +1451,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1489,7 +1487,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1523,7 +1521,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1558,7 +1556,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1592,7 +1590,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1627,7 +1625,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1663,7 +1661,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1699,7 +1697,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1734,7 +1732,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1769,7 +1767,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1803,7 +1801,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1842,7 +1840,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1902,7 +1900,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1949,7 +1947,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1988,7 +1986,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -2023,7 +2021,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"></i>Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -2749,11 +2747,8 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
       <!--========================================EDIT INFANT MODALs =================================-->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.min.js" integrity="sha384-7qAoOXltbVP82dhxHAUje59V5r2YsVfBafyUDxEdApLPmcdhBPg1DKg1ERo0BZlK" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/target_quota.js"></script>
     <script src="../assets/js/filter_function.js"></script>
@@ -2824,6 +2819,7 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
    <script src="../assets/js/edit_infant.js"></script> 
    <script src="../assets/js/edit_prenatal_checkup.js"></script> 
    <script src="../assets/js/infant_medical_script.js"></script>
+   <script src="../assets/js/postpartum_medical_script.js"></script>
    
     <script>
         function loadPage(page, clickedElement) {
@@ -2833,14 +2829,13 @@ if (!isset($_SESSION["user_id"]) || $_SESSION["role"] !== "Midwife") {
                 link.classList.remove('active');
             });
 
-            // Add active class to the clicked link (kung provided)
+            
             if (clickedElement) {
                 clickedElement.classList.add('active');
             }
 
             fetch(page)
                 .then(response => {
-                    // Error handling kung hindi ok ang response (e.g., 404 o server error)
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }

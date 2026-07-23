@@ -635,6 +635,12 @@ function applyPatientType(type) {
   const ageGroup          = document.getElementById("age_group");
   const ageInput          = document.getElementById("age");
   const ageBracketRadios  = document.querySelectorAll('input[name="age_bracket"]');
+  const pregnancyMetricsGroup = document.getElementById("pregnancy_metrics_group");
+  const lmpInput       = document.getElementById("lmp");
+  const edcInput        = document.getElementById("edc");
+  const gravidityInput  = document.getElementById("gravidity");
+  const parityInput     = document.getElementById("parity");
+  const pregnancyMetricInputs = [lmpInput, edcInput, gravidityInput, parityInput];
 
   // Reveal the rest of the form now that a type has been chosen
   fieldsContainer.style.display = "";
@@ -658,6 +664,9 @@ function applyPatientType(type) {
     ageBracketRadios.forEach((r) => { r.checked = false; r.disabled = true; });
     ageInput.value = "";
     ageInput.disabled = true;
+
+    pregnancyMetricsGroup.style.display = "none";
+    pregnancyMetricInputs.forEach((el) => { if (el) { el.value = ""; el.disabled = true; } });
   } else {
     // Maternal & Postpartum share the same field names
     firstNameInput.name  = "first_name";
@@ -673,6 +682,15 @@ function applyPatientType(type) {
     ageGroup.style.display = "";
     ageInput.disabled = false;
     updateAgeBracketFromBirthdate(); // re-lock/re-derive based on current birth date value
+
+    if (type === "maternal") {
+      pregnancyMetricsGroup.style.display = "";
+      pregnancyMetricInputs.forEach((el) => { if (el) el.disabled = false; });
+    } else {
+      // Postpartum doesn't need pregnancy metrics at this step
+      pregnancyMetricsGroup.style.display = "none";
+      pregnancyMetricInputs.forEach((el) => { if (el) { el.value = ""; el.disabled = true; } });
+    }
   }
 }
 
@@ -822,6 +840,17 @@ function validatePatientInfoForm(form) {
     } else if (ageInput && ageInput.value && !validateAgeBracket(ageInput.value, ageBracketInput.value)) {
       fail(ageInput, "error_age", "Age does not match selected bracket");
     }
+
+    if (type === "maternal") {
+      const gravidityInput = form.querySelector('input[name="gravidity"]');
+      if (gravidityInput && gravidityInput.value !== "" && parseFloat(gravidityInput.value) < 0) {
+        fail(gravidityInput, "error_gravidity", "Cannot be negative");
+      }
+      const parityInput = form.querySelector('input[name="parity"]');
+      if (parityInput && parityInput.value !== "" && parseFloat(parityInput.value) < 0) {
+        fail(parityInput, "error_parity", "Cannot be negative");
+      }
+    }
   }
 
   return { isValid, errorMessages, patientType: type };
@@ -878,7 +907,19 @@ document.addEventListener("click", function (e) {
       }).then((swalResult) => {
         if (swalResult.isConfirmed) {
           const nextPage = MEDICAL_INFO_PAGES[result.patientType];
-          loadPage(`${nextPage}?patient_id=${encodeURIComponent(data.patient_id)}`);
+          let url = `${nextPage}?patient_id=${encodeURIComponent(data.patient_id)}`;
+
+          if (result.patientType === "maternal") {
+            const carryFields = ["lmp", "edc", "gravidity", "parity"];
+            carryFields.forEach((name) => {
+              const input = form.querySelector(`[name="${name}"]`);
+              if (input && input.value !== "") {
+                url += `&${name}=${encodeURIComponent(input.value)}`;
+              }
+            });
+          }
+
+          loadPage(url);
         } else {
           loadPage("home.php");
         }

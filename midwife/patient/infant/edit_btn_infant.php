@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $middle_name = $_POST['infant_middle_name'] ?? '';
     $last_name = $_POST['infant_last_name'] ?? '';
     $date_registration = $_POST['date_of_registration'] ?? '';
+    $birth_date = $_POST['infant_birth_date'] ?? '';
     $family_serial_no = $_POST['family_serial_number'] ?? '';
     $socio_economic_status = $_POST['socio_economic_status'] ?? '';
     $address = $_POST['address'] ?? '';
@@ -29,7 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         address = ?, 
         name_of_mother = ?,
         email = ?, 
-        contact_number = ?
+        contact_number = ?,
+        birth_date = ?
         WHERE patient_id = ?";
         
     $stmt = $conn->prepare($query);
@@ -40,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     }
  
 
-    $stmt->bind_param("ssssssssssi", 
+    $stmt->bind_param("sssssssssssi", 
         $first_name, 
         $middle_name, 
         $last_name,
@@ -51,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $name_of_mother, 
         $email, 
         $contact_number, 
+        $birth_date,
         $patient_id
     );
 

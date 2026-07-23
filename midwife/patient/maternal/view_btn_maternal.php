@@ -61,67 +61,62 @@ if (isset($_GET["patient_id"])) {
                     <div class='panel-heading'>
                         <div class='panel-body'>
                             <div class='mt-3'>
-                                <a
-                                    href='#'
+                                <button
+                                    type='button'
                                     onclick='loadPage(`patient/maternal/view_maternal_patient.php`); return false;'
-                                    class='link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover pe-auto'
-                                    style='cursor: pointer;'
-                                >
-                                    &lt; Back to Patients
-                                </a>
+                                    class='btn btn-outline-secondary btn-sm'>
+                                     Back to Patients
+                                </button>
                             </div>
-                            <div class = 'table-responsive'>
-                    <table class = 'table table-bordered'>
-                        <tr>
-                            <td class = 'table-dark text-center' colspan = '2'><label><strong>BASIC INFORMATION</strong></label></td>  
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>No.</strong></label></td>
-                            <td width = '60%'>{$row['patient_id']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Date of Registration(yyyy-mm-dd)</strong></label></td>
-                            <td width = '60%'>{$row['date_of_registration']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Family Serial No.</strong></label></td>
-                            <td width = '60%'>{$family_serial_no}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Full Name</strong></label></td>
-                            <td width = '60%'>{$full_name}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Address</strong></label></td>
-                            <td width = '60%'>{$row['address']}</td>
-                        </tr>
-                        <tr>
-                            <td width = '40%'><label><strong>Socio Economic Status</strong></label></td>
-                            <td width = '60%'>{$row['socio_economic_status']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Date of Birth(yyyy-mm-dd)</strong></label></td>
-                            <td width = '60%'>{$row['birth_date']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Age Bracket</strong></label></td>
-                            <td width = '60%'>{$row['age_bracket']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Age</strong></label></td>
-                            <td width = '60%'>{$row['age']}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Email</strong></label></td>
-                            <td width = '60%'>{$email}</td>
-                         </tr>
-                         <tr>
-                            <td width = '40%'><label><strong>Contact No.</strong></label></td>
-                            <td width = '60%'>{$contact}</td>
-                         </tr>         
-                    </table>
-               </div>
-               
+                            <div class='card shadow-sm rounded mb-3'>
+                                <div class='card-header bg-dark text-white text-center'>
+                                    <strong>BASIC INFORMATION</strong>
+                                </div>
+                                <div class='card-body'>
+                                    <div class='row row-cols-1 row-cols-md-2 g-3'>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>No.</div>
+                                            <div class='fw-semibold'>{$row['patient_id']}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Full Name</div>
+                                            <div class='fw-semibold'>{$full_name}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Family Serial No.</div>
+                                            <div class='fw-semibold'>{$family_serial_no}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Date of Registration <span class='fw-normal'>(yyyy-mm-dd)</span></div>
+                                            <div class='fw-semibold'>{$row['date_of_registration']}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Date of Birth <span class='fw-normal'>(yyyy-mm-dd)</span></div>
+                                            <div class='fw-semibold'>{$row['birth_date']}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Age / Age Bracket</div>
+                                            <div class='fw-semibold'>{$row['age']} &nbsp;<span class='text-muted'>({$row['age_bracket']})</span></div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Socio Economic Status</div>
+                                            <div class='fw-semibold'>{$row['socio_economic_status']}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Address</div>
+                                            <div class='fw-semibold'>{$row['address']}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Email</div>
+                                            <div class='fw-semibold'>{$email}</div>
+                                        </div>
+                                        <div class='col'>
+                                            <div class='text-muted small mb-1'>Contact No.</div>
+                                            <div class='fw-semibold'>{$contact}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
             ";
     }
@@ -136,9 +131,9 @@ if (isset($_GET["patient_id"])) {
 
     $output .= "
         <div class = 'table-responsive mt-3' > 
-            <table class = 'table table-bordered'>
+            <table class = 'table table-bordered table-sm table-striped align-middle'>
                 <tr>
-                    <td class= 'table-dark text-center' colspan = '2'><label?><strong>PREGNANCY LIST</strong></label></td>
+                    <td class= 'table-dark text-center' colspan = '2'><strong>PREGNANCY LIST</strong></td>
                 </tr>";
 
     if ($pregnancy_result->num_rows > 0) {
@@ -147,8 +142,11 @@ if (isset($_GET["patient_id"])) {
             $format_date = date('Y-m-d', strtotime($pregnancy['date_created']));
             $output .= "
                 <tr>
-                    <td><strong>Pregnancy #{$pregnancy_count}</strong> ( Date Created: {$format_date}) </td>
                     <td>
+                        <span class='badge bg-secondary me-2'>#{$pregnancy_count}</span>
+                        <span class='text-muted'>Date Created: {$format_date}</span>
+                    </td>
+                    <td class='text-end'>
                         <button class = 'btn btn-sm btn-outline-primary view_preg_btn'
                                 data-preg-id ='{$pregnancy['pregnancy_id']}'
                                 data-preg-num = '{$pregnancy_count}'
