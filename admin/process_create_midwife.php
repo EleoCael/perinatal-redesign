@@ -173,34 +173,24 @@ if (!empty($email) && empty($errors)) {
     }
 }
 
+// NOTE: multiple midwives are now allowed per barangay/health center,
+// so we no longer block creation when a midwife is already assigned there.
+// We still confirm the barangay itself exists.
 if ($health_center_id > 0 && empty($errors)) {
-    $check_midwife_sql = "SELECT user_id FROM user WHERE health_center_id = ? AND role = 'Midwife' LIMIT 1";
-    $stmt = mysqli_prepare($conn, $check_midwife_sql);
-    
+    $check_hc_sql = "SELECT health_center_id FROM health_center WHERE health_center_id = ? LIMIT 1";
+    $stmt = mysqli_prepare($conn, $check_hc_sql);
+
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "i", $health_center_id);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_store_result($stmt);
-        
-        if (mysqli_stmt_num_rows($stmt) > 0) {
-            $hc_name = '';
-            $name_sql = "SELECT barangay_name FROM health_center WHERE health_center_id = ? LIMIT 1";
-            $name_stmt = mysqli_prepare($conn, $name_sql);
-            
-            if ($name_stmt) {
-                mysqli_stmt_bind_param($name_stmt, "i", $health_center_id);
-                mysqli_stmt_execute($name_stmt);
-                mysqli_stmt_bind_result($name_stmt, $hc_name);
-                mysqli_stmt_fetch($name_stmt);
-                mysqli_stmt_close($name_stmt);
-            }
 
-            $hc_display = $hc_name ? htmlspecialchars($hc_name) : 'selected';
-            $errors[] = "Barangay {$hc_display} already has an assigned midwife";
+        if (mysqli_stmt_num_rows($stmt) == 0) {
+            $errors[] = "Selected barangay does not exist";
         }
         mysqli_stmt_close($stmt);
     } else {
-        $errors[] = "Database error checking midwife assignment";
+        $errors[] = "Database error checking barangay";
     }
 }
 

@@ -79,19 +79,20 @@ function reassignBarangay($conn, $user_id, $midwife) {
         sendJsonResponse(['success' => false, 'message' => 'Invalid barangay selection.'], $conn);
     }
     
+    // Multiple midwives are now allowed per barangay, so we only need to
+    // confirm the target barangay actually exists.
     $check_barangay_sql = "SELECT hc.health_center_id, hc.barangay_name
-                           FROM health_center hc 
-                           LEFT JOIN user u ON hc.health_center_id = u.health_center_id AND u.role = 'Midwife' AND u.is_verified = 1
-                           WHERE hc.health_center_id = ? AND (u.user_id IS NULL OR u.user_id = ?)";
+                           FROM health_center hc
+                           WHERE hc.health_center_id = ?";
     $stmt = mysqli_prepare($conn, $check_barangay_sql);
-    mysqli_stmt_bind_param($stmt, "ii", $new_barangay_id, $user_id);
+    mysqli_stmt_bind_param($stmt, "i", $new_barangay_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $new_barangay = mysqli_fetch_assoc($result);
     mysqli_stmt_close($stmt);
     
     if (!$new_barangay) {
-        sendJsonResponse(['success' => false, 'message' => 'Selected barangay not found or already occupied by another midwife.'], $conn);
+        sendJsonResponse(['success' => false, 'message' => 'Selected barangay not found.'], $conn);
     }
     
     $update_sql = "UPDATE user SET health_center_id = ? WHERE user_id = ?";

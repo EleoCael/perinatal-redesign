@@ -33,12 +33,12 @@ foreach ($all_barangays as $barangay) {
 }
 
 $health_centers = [];
-$health_center_sql = "SELECT hc.health_center_id, hc.barangay_name, 
-                      u.user_id as midwife_assigned,
-                      CONCAT(u.first_name, ' ', u.last_name) as midwife_name
+$health_center_sql = "SELECT hc.health_center_id, hc.barangay_name,
+                      COUNT(u.user_id) as midwife_count
                       FROM health_center hc
-                      LEFT JOIN user u ON hc.health_center_id = u.health_center_id AND u.role = 'Midwife'
+                      LEFT JOIN user u ON hc.health_center_id = u.health_center_id AND u.role = 'Midwife' AND u.is_verified = 1
                       WHERE hc.barangay_name IN ('" . implode("','", $all_barangays) . "')
+                      GROUP BY hc.health_center_id, hc.barangay_name
                       ORDER BY hc.barangay_name";
 $result = mysqli_query($conn, $health_center_sql);
 if ($result) {
@@ -88,10 +88,11 @@ if ($result) {
                         <select class="form-select" id="health_center_id" name="health_center_id" required>
                             <option value="">Select Barangay</option>
                             <?php foreach ($health_centers as $center): ?>
-                                <?php $is_occupied = !empty($center['midwife_assigned']); ?>
-                                <option value="<?php echo $center['health_center_id']; ?>" <?php echo $is_occupied ? 'disabled' : ''; ?>>
+                                <option value="<?php echo $center['health_center_id']; ?>">
                                     <?php echo htmlspecialchars($center['barangay_name']); ?>
-                                    <?php if ($is_occupied): ?>(Occupied)<?php endif; ?>
+                                    <?php if ($center['midwife_count'] > 0): ?>
+                                        (<?php echo (int)$center['midwife_count']; ?> midwife<?php echo $center['midwife_count'] > 1 ? 's' : ''; ?> assigned)
+                                    <?php endif; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -117,4 +118,3 @@ if ($result) {
         </form>
     </div>
 </div>
-

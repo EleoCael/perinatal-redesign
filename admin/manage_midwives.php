@@ -23,10 +23,11 @@ if ($midwives_result && mysqli_num_rows($midwives_result) > 0) {
     }
 }
 
-$available_barangays_sql = "SELECT hc.health_center_id, hc.barangay_name
+$available_barangays_sql = "SELECT hc.health_center_id, hc.barangay_name,
+                           COUNT(u.user_id) as midwife_count
                            FROM health_center hc
                            LEFT JOIN user u ON hc.health_center_id = u.health_center_id AND u.role = 'Midwife' AND u.is_verified = 1
-                           WHERE u.user_id IS NULL
+                           GROUP BY hc.health_center_id, hc.barangay_name
                            ORDER BY hc.barangay_name";
 $available_barangays_result = mysqli_query($conn, $available_barangays_sql);
 $available_barangays = [];
@@ -140,6 +141,9 @@ mysqli_close($conn);
                         <?php foreach ($available_barangays as $barangay): ?>
                             <option value="<?php echo $barangay['health_center_id']; ?>">
                                 <?php echo htmlspecialchars($barangay['barangay_name']); ?>
+                                <?php if ($barangay['midwife_count'] > 0): ?>
+                                    (<?php echo (int)$barangay['midwife_count']; ?> midwife<?php echo $barangay['midwife_count'] > 1 ? 's' : ''; ?> assigned)
+                                <?php endif; ?>
                             </option>
                         <?php endforeach; ?>
                     </select>

@@ -99,37 +99,21 @@ if (!empty($email) && empty($errors)) {
     }
 }
 
+// NOTE: multiple midwives are now allowed per barangay/health center,
+// so we no longer block editing when another midwife is already assigned there.
 if ($health_center_id > 0 && empty($errors)) {
-    $check_midwife_sql = "SELECT user_id, first_name, last_name 
-                          FROM user 
-                          WHERE health_center_id = ? 
-                          AND role = 'Midwife' 
-                          AND user_id != ?";
-    $stmt = mysqli_prepare($conn, $check_midwife_sql);
+    $check_hc_sql = "SELECT health_center_id FROM health_center WHERE health_center_id = ?";
+    $stmt = mysqli_prepare($conn, $check_hc_sql);
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "ii", $health_center_id, $user_id);
+        mysqli_stmt_bind_param($stmt, "i", $health_center_id);
         mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-        $occupying_midwife = mysqli_fetch_assoc($result);
-        mysqli_stmt_close($stmt);
-        
-        if ($occupying_midwife) {
-            $hc_name = '';
-            $name_sql = "SELECT barangay_name FROM health_center WHERE health_center_id = ?";
-            $name_stmt = mysqli_prepare($conn, $name_sql);
-            if($name_stmt) {
-                mysqli_stmt_bind_param($name_stmt, "i", $health_center_id);
-                mysqli_stmt_execute($name_stmt);
-                mysqli_stmt_bind_result($name_stmt, $hc_name);
-                mysqli_stmt_fetch($name_stmt);
-                mysqli_stmt_close($name_stmt);
-            }
-
-            $midwife_name = $occupying_midwife['first_name'] . ' ' . $occupying_midwife['last_name'];
-            $errors[] = "Barangay " . ($hc_name ? htmlspecialchars($hc_name) : 'selected') . " is already assigned to midwife: " . $midwife_name;
+        mysqli_stmt_store_result($stmt);
+        if (mysqli_stmt_num_rows($stmt) == 0) {
+            $errors[] = "Selected barangay does not exist";
         }
+        mysqli_stmt_close($stmt);
     } else {
-        $errors[] = "Database error checking midwife assignment: " . mysqli_error($conn);
+        $errors[] = "Database error checking barangay: " . mysqli_error($conn);
     }
 }
 
