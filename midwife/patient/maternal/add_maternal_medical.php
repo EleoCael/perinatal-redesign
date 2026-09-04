@@ -224,7 +224,9 @@ if ($patient_id > 0) {
                 </div>
 
                 <div class="d-flex justify-content-end gap-2 mb-3 ">
-                    <button class="btn btn-secondary js-back_btn col-md-2" type="button">Back</button>
+                    <button class="btn btn-secondary col-md-2" type="button" onclick="
+                    loadPage('redo-addPatient_info.php?patient_id=<?php echo urlencode($patient_id); ?>&lmp=<?php echo urlencode($carried_lmp); ?>&edc=<?php echo urlencode($carried_edc); ?>&gravidity=<?php echo urlencode($carried_gravidity); ?>&parity=<?php echo urlencode($carried_parity); ?>');
+                 ">Back</button>
                     <button class="btn btn-primary js-next_btn col-md-2" name="next_btn" type="button">Next</button>
                 </div>
             </div>

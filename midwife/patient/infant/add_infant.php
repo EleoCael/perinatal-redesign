@@ -108,7 +108,7 @@ if (isset($_SESSION['form_errors']) && !empty($_SESSION['form_errors'])) {
 
                             <div class="d-flex justify-content-end gap-2 mb-3">
                                 <button class="btn btn-secondary col-md-2" id="back_btn" type="button" onclick="
-                                loadPage('addPatient_LandingPg.php');
+                                loadPage('home.php');
                              ">Back</button>
                                 <button class="btn btn-primary js-next_btn col-md-2" type="button">Next</button>
                             </div>
